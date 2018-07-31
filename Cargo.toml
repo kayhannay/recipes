@@ -1,0 +1,18 @@
+[package]
+name = "rocket"
+version = "0.1.0"
+authors = ["Kay Hannay <klinux@hannay.de>"]
+
+[dependencies]
+rocket = "0.3.14"
+rocket_codegen = "0.3.14"
+serde = "1.0"
+serde_derive = "1.0"
+serde_json = "1.0"
+mysql = "*"
+chrono = { version = "0.4", features = ["serde"] }
+
+[dependencies.rocket_contrib]
+version = "*"
+default-features = false
+features = ["handlebars_templates"]
