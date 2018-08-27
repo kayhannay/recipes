@@ -1,16 +1,16 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="utf-8" />
-    <title>Rezepte</title>
-  </head>
-  <body>
-    <h1>Rezeptdatenbank</h1>
-    <ul>
-        {{#each recipe_names}}
-            <li><a href="/recipe/{{this.id}}">{{this.name}}</a></li>
-        {{/each}}
-    </ul>
+    <head>
+        <meta charset="utf-8" />
+        <title>Rezepte</title>
+    </head>
+    <body>
+        <h1>Rezeptdatenbank</h1>
+        <ul>
+            {{#each recipe_names}}
+                <li><a href="/recipe/{{this.id}}">{{this.name}}</a></li>
+            {{/each}}
+        </ul>
 
-  </body>
+    </body>
 </html>
