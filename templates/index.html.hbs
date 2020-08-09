@@ -3,14 +3,21 @@
     <head>
         <meta charset="utf-8" />
         <title>Rezepte</title>
+        <style>
+            #recipe-list {
+                border: 2px solid;
+                background-color: lightblue;
+            }
+        </style>
     </head>
     <body>
-        <h1>Rezeptdatenbank</h1>
-        <ul>
-            {{#each recipe_names}}
-                <li><a href="/recipe/{{this.id}}">{{this.name}}</a></li>
-            {{/each}}
-        </ul>
-
+        <div id="recipe-overview">
+            <h1>Rezeptdatenbank</h1>
+            <ul id="recipe-list">
+                {{#each recipe_names}}
+                    <li><a href="/recipe/{{this.id}}">{{this.name}}</a></li>
+                {{/each}}
+            </ul>
+        </div>
     </body>
 </html>

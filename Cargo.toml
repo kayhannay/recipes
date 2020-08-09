@@ -1,18 +1,17 @@
 [package]
-name = "rocket"
+name = "recipes"
 version = "0.1.0"
 authors = ["Kay Hannay <klinux@hannay.de>"]
 
 [dependencies]
-rocket = "0.3.14"
-rocket_codegen = "0.3.14"
-serde = "1.0"
-serde_derive = "1.0"
-serde_json = "1.0"
-mysql = "*"
-chrono = { version = "0.4", features = ["serde"] }
+rocket = "0.4.5"
+rocket_codegen = "0.4.5"
+serde = "1.0.114"
+serde_derive = "1.0.114"
+serde_json = "1.0.57"
+chrono = { version = "0.4.13", features = ["serde"] }
 
 [dependencies.rocket_contrib]
 version = "*"
 default-features = false
-features = ["handlebars_templates"]
+features = ["handlebars_templates", "mysql_pool"]
