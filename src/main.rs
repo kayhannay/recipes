@@ -4,32 +4,37 @@
 #[macro_use] extern crate rocket_contrib;
 #[macro_use] extern crate serde_derive;
 extern crate chrono;
+#[macro_use] extern crate diesel;
+extern crate bigdecimal;
+
+pub mod schema;
 
 use rocket_contrib::templates::Template;
-use rocket_contrib::databases::mysql;
-use mysql as my;
-use mysql::params;
+use self::schema::rezepte;
+use diesel::prelude::*;
 use chrono::NaiveDateTime;
+use bigdecimal::BigDecimal;
+use schema::rezepte::all_columns;
 
 #[database("recipe_db")]
-struct RecipeDatabase(my::Conn);
+struct RecipeDatabase(diesel::MysqlConnection);
 
-#[derive(Debug, PartialEq, Eq, Serialize)]
+#[derive(Debug, Queryable, Serialize, Deserialize, Clone)]
 struct Recipe {
     id: i32,
-    category: i32,
     name: String,
     ingredients: String,
     preparation: String,
-    experience: String,
-    time_needed: String,
-    number_people: String,
+    experience: Option<String>,
+    time_needed: Option<String>,
+    number_people: Option<BigDecimal>,
     created: NaiveDateTime,
-    owner: String,
-    rights: String,
+    owner: Option<BigDecimal>,
+    rights: Option<BigDecimal>,
+    category: Option<i32>
 }
 
-#[derive(Debug, PartialEq, Eq, Serialize, Clone)]
+#[derive(Debug, Queryable, Serialize)]
 struct RecipeName {
     id: i32,
     name: String,
@@ -46,60 +51,24 @@ struct RecipeModel {
 }
 
 #[get("/")]
-fn recipe_list(mut connection: RecipeDatabase) -> Template {
-    let _recipe_names = get_recipes_names(&mut connection.0);
-    let model = RecipeOverviewModel { recipe_names: _recipe_names };
+fn recipe_list(connection: RecipeDatabase) -> Template {
+    let recipe_list: Vec<RecipeName> = rezepte::table
+        .select((rezepte::id, rezepte::name))
+        .load::<RecipeName>(&*connection)
+        .unwrap();
+    let model = RecipeOverviewModel { recipe_names: recipe_list };
     Template::render("index", &model)
 }
 
 #[get("/recipe/<id>")]
-fn recipe(id: i32, mut connection: RecipeDatabase) -> Template {
-    let _recipe = get_recipe(&mut connection.0, &id);
-    let model = RecipeModel {
-        recipe: _recipe.unwrap(),
-    };
-
+fn recipe(id: i32, connection: RecipeDatabase) -> Template {
+    let recipe: Vec<Recipe> = rezepte::table
+        .select(all_columns)
+        .filter(rezepte::id.eq(id))
+        .load::<Recipe>(&*connection)
+        .unwrap();
+    let model = RecipeModel { recipe: recipe.first().unwrap().clone() };
     Template::render("recipe", &model)
-}
-
-fn get_recipes_names(connection: &mut my::Conn) -> Vec<RecipeName> {
-    let recipes =
-        connection.prep_exec("SELECT id,name FROM rezepte", ())
-            .map(|result| {
-                result.map(|x| x.unwrap()).map(|row| {
-                    let (id, name) = my::from_row(row);
-                    RecipeName {
-                        id,
-                        name
-                    }
-                }).collect()
-            }).unwrap();
-    return recipes;
-}
-
-fn get_recipe(connection: &mut my::Conn, id: &i32) -> Option<Recipe> {
-    let mut vector: Vec<Recipe> =
-        connection.prep_exec("SELECT id,category,name,ingredients,preparation,experience,time_need,number_people,created,owner,rights FROM rezepte WHERE id=:id", params! { "id" => id })
-            .map(|result| {
-                result.map(|x| x.unwrap()).map(|row| {
-                    let (id, category, name, ingredients, preparation, experience, time_need, number_people, created, owner, rights) = my::from_row(row);
-                    Recipe {
-                        id,
-                        category,
-                        name,
-                        ingredients,
-                        preparation,
-                        experience,
-                        time_needed: time_need,
-                        number_people,
-                        created,
-                        owner,
-                        rights
-                    }
-                }).collect()
-            }).unwrap();
-    let recipe = vector.pop();
-    return recipe;
 }
 
 fn main() {
