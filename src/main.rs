@@ -7,7 +7,7 @@ extern crate chrono;
 #[macro_use] extern crate diesel;
 extern crate bigdecimal;
 
-pub mod schema;
+mod schema;
 
 use rocket_contrib::templates::Template;
 use self::schema::rezepte;
@@ -62,13 +62,20 @@ fn recipe_list(connection: RecipeDatabase) -> Template {
 
 #[get("/recipe/<id>")]
 fn recipe(id: i32, connection: RecipeDatabase) -> Template {
-    let recipe: Vec<Recipe> = rezepte::table
+    let mut recipe: Recipe = rezepte::table
         .select(all_columns)
         .filter(rezepte::id.eq(id))
         .load::<Recipe>(&*connection)
-        .unwrap();
-    let model = RecipeModel { recipe: recipe.first().unwrap().clone() };
+        .unwrap().first().unwrap().clone();
+    recipe = convert_newline(recipe);
+    let model = RecipeModel { recipe };
     Template::render("recipe", &model)
+}
+
+fn convert_newline(mut recipe: Recipe) -> Recipe {
+    recipe.ingredients = recipe.ingredients.replace("\n", "<br />");
+    recipe.preparation = recipe.preparation.replace("\n", "<br />");
+    return recipe;
 }
 
 fn main() {
