@@ -1,0 +1,16 @@
+image: git.hannay.de:4567/hannayk/rezepte/rust-agent:nightly
+
+tages:
+  - init
+  - build
+
+init:
+  stage: init
+  script:
+    - cargo --version
+    - rustc --version
+
+build:
+  stage: build
+  script:
+    - cargo build
