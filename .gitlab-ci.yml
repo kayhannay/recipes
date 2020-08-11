@@ -1,6 +1,6 @@
 image: git.hannay.de:4567/hannayk/rezepte/rust-agent:nightly
 
-tages:
+stages:
   - init
   - build
 
