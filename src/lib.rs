@@ -19,5 +19,5 @@ pub fn init_application() -> rocket::Rocket {
         .attach(Template::fairing())
         .attach(database::RecipeDatabase::fairing());
     database::run_migrations(&*database::RecipeDatabase::get_one(&rocket).unwrap());
-    return rocket;
+    rocket
 }

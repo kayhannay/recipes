@@ -2,6 +2,7 @@ image: git.hannay.de:4567/hannayk/rezepte/rust-agent:nightly
 
 stages:
   - init
+  - lint
   - build
   - test
 
@@ -10,6 +11,11 @@ init:
   script:
     - cargo --version
     - rustc --version
+
+lint:
+  stage: lint
+  script:
+    - cargo clippy
 
 build:
   stage: build

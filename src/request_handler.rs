@@ -33,5 +33,6 @@ struct RecipeModel {
 fn convert_newline(mut recipe: Recipe) -> Recipe {
     recipe.ingredients = recipe.ingredients.replace("\n", "<br />");
     recipe.preparation = recipe.preparation.replace("\n", "<br />");
-    return recipe;
+    recipe
 }
+
