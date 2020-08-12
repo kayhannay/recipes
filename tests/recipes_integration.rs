@@ -65,9 +65,9 @@ fn setup() -> (Client, RecipeDatabase) {
     // Start Rocket application, which is under test
     env::set_var("ROCKET_DATABASES", mysql_url);
     println!("ROCKET_DATABASES is set to {}", env::var("ROCKET_DATABASES").unwrap());
-    let client = Client::new( init_application()).expect("valid rocket instance");
-
+    let rocket = init_application();
     let database_connection = recipes_tool::database::RecipeDatabase::get_one(&rocket).unwrap();
+    let client = Client::new(rocket).expect("valid rocket instance");
 
     (client, database_connection)
 }
@@ -75,7 +75,7 @@ fn setup() -> (Client, RecipeDatabase) {
 #[test]
 fn should_render_empty_recipe_list() {
     // Given
-    let client = setup();
+    let (client, _database_connection) = setup();
 
     // When
     let mut response = client.get("/").dispatch();
