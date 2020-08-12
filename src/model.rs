@@ -3,24 +3,26 @@ extern crate chrono;
 
 use self::bigdecimal::BigDecimal;
 use self::chrono::NaiveDateTime;
+use schema::rezepte;
 
-#[derive(Debug, Queryable, Serialize, Deserialize, Clone)]
+#[derive(Debug, Queryable, Insertable, Serialize, Deserialize, Clone)]
+#[table_name="rezepte"]
 pub struct Recipe {
-    id: i32,
-    name: String,
+    pub id: i32,
+    pub name: String,
     pub ingredients: String,
     pub preparation: String,
-    experience: Option<String>,
-    time_needed: Option<String>,
-    number_people: Option<BigDecimal>,
-    created: NaiveDateTime,
-    owner: Option<BigDecimal>,
-    rights: Option<BigDecimal>,
-    category: Option<i32>
+    pub experience: Option<String>,
+    pub time_need: Option<String>,
+    pub number_people: Option<BigDecimal>,
+    pub created: NaiveDateTime,
+    pub owner: Option<BigDecimal>,
+    pub rights: Option<BigDecimal>,
+    pub category: Option<i32>
 }
 
 #[derive(Debug, Queryable, Serialize)]
 pub struct RecipeName {
-    id: i32,
-    name: String,
+    pub id: i32,
+    pub name: String,
 }

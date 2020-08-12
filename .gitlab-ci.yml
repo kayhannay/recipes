@@ -3,6 +3,7 @@ image: git.hannay.de:4567/hannayk/rezepte/rust-agent:nightly
 stages:
   - init
   - build
+  - test
 
 init:
   stage: init
@@ -14,3 +15,8 @@ build:
   stage: build
   script:
     - cargo build
+
+test:
+  stage: test
+  script:
+    - cargo test
