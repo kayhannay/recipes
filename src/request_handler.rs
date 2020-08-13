@@ -13,11 +13,11 @@ pub fn recipe_list(connection: RecipeDatabase) -> Template {
 }
 
 #[get("/recipe/<id>")]
-pub fn recipe(id: i32, connection: RecipeDatabase) -> Template {
-    let mut recipe= get_recipe(id, connection);
-    recipe = convert_newline(recipe);
-    let model = RecipeModel { recipe };
-    Template::render("recipe", &model)
+pub fn recipe(id: i32, connection: RecipeDatabase) -> Option<Template> {
+    let recipe= get_recipe(id, connection);
+    let converted_recipe = convert_newline(recipe?);
+    let model = RecipeModel { recipe: converted_recipe };
+    Some(Template::render("recipe", &model))
 }
 
 #[derive(Serialize)]

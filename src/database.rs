@@ -20,13 +20,15 @@ pub fn get_recipes(connection: RecipeDatabase) -> Vec<RecipeName> {
     recipe_list
 }
 
-pub fn get_recipe(id: i32, connection: RecipeDatabase) -> Recipe {
-    let recipe: Recipe = rezepte::table
+pub fn get_recipe(id: i32, connection: RecipeDatabase) -> Option<Recipe> {
+    let recipe = rezepte::table
         .select(all_columns)
         .filter(rezepte::id.eq(id))
         .load::<Recipe>(&*connection)
-        .unwrap().first().unwrap().clone();
-    recipe
+        .unwrap()
+        .first()?
+        .clone();
+    Some(recipe)
 }
 
 pub fn save_recipe(recipe: &Recipe, connection: RecipeDatabase) {
