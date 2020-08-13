@@ -15,7 +15,7 @@ init:
 lint:
   stage: lint
   script:
-    - cargo clippy
+    - cargo clippy -- -D warnings
 
 build:
   stage: build
