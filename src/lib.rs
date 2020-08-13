@@ -14,6 +14,7 @@ pub mod database;
 use rocket_contrib::templates::Template;
 
 pub fn init_application() -> rocket::Rocket {
+    dotenv::dotenv().ok();
     let rocket = rocket::ignite()
         .mount("/", routes![request_handler::recipe_list, request_handler::recipe])
         .attach(Template::fairing())

@@ -58,14 +58,12 @@ impl Image for MySql {
 fn setup() -> (Client, RecipeDatabase) {
     // Start MySQL Docker container
     let docker = clients::Cli::default();
-    println!("Starting docker container");
     let container = docker.run(MySql);
     let mysql_port = container.get_host_port(3306);
     let mysql_url = format!("{{recipe_db={{url=\"mysql://rezepte:rezepte-secret@127.0.0.1:{}/rezepte\"}}}}", mysql_port.unwrap());
 
     // Start Rocket application, which is under test
     env::set_var("ROCKET_DATABASES", mysql_url);
-    println!("ROCKET_DATABASES is set to {}", env::var("ROCKET_DATABASES").unwrap());
     let rocket = init_application();
     let database_connection = recipes_tool::database::RecipeDatabase::get_one(&rocket).unwrap();
     let client = Client::new(rocket).expect("valid rocket instance");
