@@ -137,7 +137,7 @@ fn should_render_recipe() {
 }
 
 #[test]
-fn should_return_404() {
+fn should_return_404_for_missing_recipe() {
     // Given
     let (client, _database_connection) = setup();
 

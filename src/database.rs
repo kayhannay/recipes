@@ -1,7 +1,8 @@
-use model::{RecipeName, Recipe};
-use schema::rezepte;
+use model::{RecipeName, Recipe, RecipeUser};
+use schema::{rezepte, user};
 use diesel::prelude::*;
 use schema::rezepte::all_columns;
+use diesel::result::Error;
 
 embed_migrations!();
 
@@ -36,4 +37,21 @@ pub fn save_recipe(recipe: &Recipe, connection: RecipeDatabase) {
         .values(recipe)
         .execute(&*connection)
         .expect("Error saving receipt");
+}
+
+pub fn get_user(username: String, connection: RecipeDatabase) -> Option<RecipeUser> {
+    let user = user::table
+        .select((user::username, user::password, user::name))
+        .filter(&user::username.eq(username))
+        .load::<RecipeUser>(&*connection)
+        .unwrap()
+        .first()?
+        .clone();
+    Some(user)
+}
+
+pub fn save_user(user: &RecipeUser, connection: RecipeDatabase) -> Result<usize, Error> {
+    diesel::insert_into(user::table)
+        .values(user)
+        .execute(&*connection)
 }

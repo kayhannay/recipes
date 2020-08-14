@@ -4,6 +4,7 @@ extern crate chrono;
 use self::bigdecimal::BigDecimal;
 use self::chrono::NaiveDateTime;
 use schema::rezepte;
+use schema::user;
 
 #[derive(Debug, Queryable, Insertable, Serialize, Deserialize, Clone)]
 #[table_name="rezepte"]
@@ -25,4 +26,12 @@ pub struct Recipe {
 pub struct RecipeName {
     pub id: i32,
     pub name: String,
+}
+
+#[derive(Debug, Queryable, Insertable, Serialize, Deserialize, Clone)]
+#[table_name="user"]
+pub struct RecipeUser {
+    pub username: String,
+    pub password: String,
+    pub name: Option<String>
 }

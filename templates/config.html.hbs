@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>Rezepte - konfiguration</title>
+</head>
+<body>
+{{> header }}
+
+<h1>Rezepte: Konfiguration</h1>
+
+<p>Dies ist die Konfigurationsseite.</p>
+
+<h2>Add a new user</h2>
+<form action="/user" method="post" accept-charset="utf-8">
+    <label for="username">username</label>
+    <input type="text" name="username" id="username" value="" />
+    <label for="password">password</label>
+    <input type="password" name="password" id="password" value="" />
+    <label for="name">Name</label>
+    <input type="text" name="name" id="name" value="" />
+    <p><input type="submit" value="create"></p>
+</form>
+
+{{#if common.message}}
+    <p>{{#if common.message_type}}{{common.message_type}}: {{/if}}{{ common.message }}</p>
+{{/if}}
+
+</body>
+</html>

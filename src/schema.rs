@@ -33,6 +33,17 @@ table! {
 }
 
 table! {
+    user (uid) {
+        uid -> Integer,
+        password -> Varchar,
+        username -> Varchar,
+        name -> Nullable<Varchar>,
+        role -> Nullable<Integer>,
+        created -> Timestamp,
+    }
+}
+
+table! {
     users (uid) {
         uid -> Integer,
         passwd -> Varchar,
@@ -47,5 +58,6 @@ allow_tables_to_appear_in_same_query!(
     categories,
     rezepte,
     sessions,
+    user,
     users,
 );
