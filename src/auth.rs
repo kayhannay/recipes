@@ -59,16 +59,20 @@ impl<'a, 'r> FromRequest<'a, 'r> for User {
 
 #[post("/login", data = "<login>")]
 pub fn login(connection: RecipeDatabase, mut cookies: Cookies, login: Form<Login>) -> Result<Redirect, Flash<Redirect>> {
-    let recipe_user = database::get_user(login.username.clone(), connection);
+    let username = &login.username.clone();
+    let recipe_user = database::get_user(username, &connection);
     let error = Err(Flash::error(Redirect::to(uri!(login_page)), "Login failed!"));
     if recipe_user.is_none() {
+        log::info!("Failed login of user {}", username);
         return error;
     }
     let user = recipe_user.unwrap();
     if create_hash(&login.password) == user.password {
         cookies.add_private(Cookie::new(COOKIE_NAME, user.name.unwrap()));
+        log::info!("Successful login of user {}", user.username);
         Ok(Redirect::to(uri!(request_handler::recipe_list)))
     } else{
+        log::info!("Failed login of user {}", user.username);
         error
     }
 }
@@ -76,6 +80,7 @@ pub fn login(connection: RecipeDatabase, mut cookies: Cookies, login: Form<Login
 #[post("/logout")]
 pub fn logout(mut cookies: Cookies) -> Flash<Redirect> {
     cookies.remove_private(Cookie::named(COOKIE_NAME));
+    log::debug!("Successful logout of some user");
     Flash::success(Redirect::to(uri!(login_page)), "Successfully logged out.")
 }
 
@@ -122,13 +127,17 @@ pub fn create_user(connection: RecipeDatabase, new_user: Form<CreateUser>) -> Re
     if login_user.username.is_empty() || login_user.password.is_empty() {
         return error;
     }
-    let result = database::save_user(&RecipeUser {
+    let recipe_user = RecipeUser {
         username: login_user.username,
         password: create_hash(&login_user.password),
         name: login_user.name
-    }, connection);
+    };
+    let result = database::save_user(&recipe_user, connection);
     match result {
-        Ok(_) => Ok(Flash::success(Redirect::to(uri!(user_config)), "User created")),
+        Ok(_) => {
+            log::info!("Created user {}", &recipe_user.username);
+            Ok(Flash::success(Redirect::to(uri!(user_config)), "User created"))
+        },
         Err(_) => error
     }
 }

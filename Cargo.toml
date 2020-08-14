@@ -16,6 +16,8 @@ diesel_migrations = { version = "1.4.0" }
 bigdecimal = { version = "*", features = ["serde"] }
 dotenv = "0.15.0"
 rust-crypto = "0.2.36"
+log = "0.4.11"
+env_logger = "0.7.1"
 
 [dev-dependencies]
 testcontainers = "0.9.1"

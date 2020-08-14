@@ -39,11 +39,11 @@ pub fn save_recipe(recipe: &Recipe, connection: RecipeDatabase) {
         .expect("Error saving receipt");
 }
 
-pub fn get_user(username: String, connection: RecipeDatabase) -> Option<RecipeUser> {
+pub fn get_user(username: &String, connection: &RecipeDatabase) -> Option<RecipeUser> {
     let user = user::table
         .select((user::username, user::password, user::name))
         .filter(&user::username.eq(username))
-        .load::<RecipeUser>(&*connection)
+        .load::<RecipeUser>(&**connection)
         .unwrap()
         .first()?
         .clone();
