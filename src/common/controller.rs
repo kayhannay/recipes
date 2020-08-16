@@ -7,7 +7,7 @@ pub enum MessageType {
     ERROR,
     WARN,
     INFO,
-    None
+    None,
 }
 
 #[derive(Debug, Serialize)]
@@ -17,7 +17,7 @@ pub struct User(String);
 pub struct CommonContext {
     pub current_user: Option<User>,
     pub message: Option<String>,
-    pub message_type: MessageType
+    pub message_type: MessageType,
 }
 
 pub fn get_current_user(mut cookies: Cookies) -> Option<User> {

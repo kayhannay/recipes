@@ -6,7 +6,7 @@ use self::chrono::NaiveDateTime;
 use common::schema::rezepte;
 
 #[derive(Debug, Queryable, Insertable, Serialize, Deserialize, Clone)]
-#[table_name="rezepte"]
+#[table_name = "rezepte"]
 pub struct Recipe {
     pub id: i32,
     pub name: String,
@@ -18,7 +18,7 @@ pub struct Recipe {
     pub created: NaiveDateTime,
     pub owner: Option<BigDecimal>,
     pub rights: Option<BigDecimal>,
-    pub category: Option<i32>
+    pub category: Option<i32>,
 }
 
 #[derive(Debug, Queryable, Serialize)]

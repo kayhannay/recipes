@@ -1,8 +1,8 @@
 use common::repository::RecipeDatabase;
-use recipe::model::{RecipeName, Recipe};
 use common::schema::rezepte;
-use diesel::prelude::*;
 use common::schema::rezepte::all_columns;
+use diesel::prelude::*;
+use recipe::model::{Recipe, RecipeName};
 
 pub fn get_recipes(connection: RecipeDatabase) -> Vec<RecipeName> {
     let recipe_list: Vec<RecipeName> = rezepte::table

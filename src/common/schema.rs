@@ -54,10 +54,4 @@ table! {
     }
 }
 
-allow_tables_to_appear_in_same_query!(
-    categories,
-    rezepte,
-    sessions,
-    user,
-    users,
-);
+allow_tables_to_appear_in_same_query!(categories, rezepte, sessions, user, users,);
