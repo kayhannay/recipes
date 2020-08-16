@@ -11,6 +11,7 @@ extern crate diesel;
 #[macro_use]
 extern crate diesel_migrations;
 extern crate chrono;
+extern crate crypto;
 extern crate dotenv;
 extern crate env_logger;
 extern crate log;
@@ -48,12 +49,12 @@ pub fn init_application() -> rocket::Rocket {
             routes![
                 controller::recipe::recipe_list,
                 controller::recipe::recipe,
-                controller::user::login,
-                controller::user::login_user,
-                controller::user::login_page,
-                controller::user::config,
-                controller::user::user_config,
-                controller::user::logout,
+                controller::login::login,
+                controller::login::login_user,
+                controller::login::login_page,
+                controller::config::config,
+                controller::config::user_config,
+                controller::login::logout,
                 controller::user::create_user
             ],
         )

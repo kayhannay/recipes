@@ -4,9 +4,9 @@ extern crate rocket;
 extern crate testcontainers;
 
 use chrono::Utc;
-use recipes_tool::repository::common::RecipeDatabase;
-use recipes_tool::init_application;
 use recipes_tool::domain::recipe::Recipe;
+use recipes_tool::init_application;
+use recipes_tool::repository::common::RecipeDatabase;
 use rocket::http::Status;
 use rocket::local::Client;
 use std::collections::HashMap;
