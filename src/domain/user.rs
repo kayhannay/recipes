@@ -1,4 +1,4 @@
-use common::schema::user;
+use repository::schema::user;
 
 #[derive(Debug, Queryable, Insertable, Serialize, Deserialize, Clone)]
 #[table_name = "user"]

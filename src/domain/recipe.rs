@@ -3,7 +3,7 @@ extern crate chrono;
 
 use self::bigdecimal::BigDecimal;
 use self::chrono::NaiveDateTime;
-use common::schema::rezepte;
+use repository::schema::rezepte;
 
 #[derive(Debug, Queryable, Insertable, Serialize, Deserialize, Clone)]
 #[table_name = "rezepte"]

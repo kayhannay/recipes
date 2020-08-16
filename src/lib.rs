@@ -15,9 +15,9 @@ extern crate dotenv;
 extern crate env_logger;
 extern crate log;
 
-pub mod common;
-pub mod recipe;
-pub mod user;
+pub mod controller;
+pub mod domain;
+pub mod repository;
 
 use chrono::Local;
 use env_logger::Builder;
@@ -46,21 +46,21 @@ pub fn init_application() -> rocket::Rocket {
         .mount(
             "/",
             routes![
-                recipe::controller::recipe_list,
-                recipe::controller::recipe,
-                user::controller::login,
-                user::controller::login_user,
-                user::controller::login_page,
-                user::controller::config,
-                user::controller::user_config,
-                user::controller::logout,
-                user::controller::create_user
+                controller::recipe::recipe_list,
+                controller::recipe::recipe,
+                controller::user::login,
+                controller::user::login_user,
+                controller::user::login_page,
+                controller::user::config,
+                controller::user::user_config,
+                controller::user::logout,
+                controller::user::create_user
             ],
         )
         .attach(Template::fairing())
-        .attach(common::repository::RecipeDatabase::fairing());
-    common::repository::run_migrations(
-        &*common::repository::RecipeDatabase::get_one(&rocket).unwrap(),
+        .attach(repository::common::RecipeDatabase::fairing());
+    repository::common::run_migrations(
+        &*repository::common::RecipeDatabase::get_one(&rocket).unwrap(),
     );
     rocket
 }

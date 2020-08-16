@@ -4,9 +4,9 @@ extern crate rocket;
 extern crate testcontainers;
 
 use chrono::Utc;
-use recipes_tool::common::repository::RecipeDatabase;
+use recipes_tool::repository::common::RecipeDatabase;
 use recipes_tool::init_application;
-use recipes_tool::recipe::model::Recipe;
+use recipes_tool::domain::recipe::Recipe;
 use rocket::http::Status;
 use rocket::local::Client;
 use std::collections::HashMap;
@@ -117,7 +117,7 @@ fn should_render_recipe_list() {
     // Given
     let (client, database_connection) = setup();
     let recipe = create_test_recipe();
-    recipes_tool::recipe::repository::save_recipe(&recipe, database_connection);
+    recipes_tool::repository::recipe::save_recipe(&recipe, database_connection);
 
     // When
     let mut response = client.get("/").dispatch();
@@ -135,7 +135,7 @@ fn should_render_recipe() {
     // Given
     let (client, database_connection) = setup();
     let recipe = create_test_recipe();
-    recipes_tool::recipe::repository::save_recipe(&recipe, database_connection);
+    recipes_tool::repository::recipe::save_recipe(&recipe, database_connection);
 
     // When
     let mut response = client.get(format!("/recipe/{}", recipe.id)).dispatch();

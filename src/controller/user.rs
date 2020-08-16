@@ -2,10 +2,11 @@ extern crate crypto;
 
 use self::crypto::digest::Digest;
 use self::crypto::sha2::Sha512;
-use common;
-use common::controller::{CommonContext, MessageType, User};
-use common::repository::RecipeDatabase;
-use recipe;
+use controller;
+use controller::common::{CommonContext, MessageType, User};
+use domain::user::RecipeUser;
+use repository;
+use repository::common::RecipeDatabase;
 use rocket::http::{Cookie, Cookies};
 use rocket::outcome::IntoOutcome;
 use rocket::request::{FlashMessage, Form, FromRequest};
@@ -14,8 +15,6 @@ use rocket::{request, Request};
 use rocket_contrib::templates::Template;
 use std::collections::HashMap;
 use std::str;
-use user::model::RecipeUser;
-use user::repository;
 
 #[derive(FromForm)]
 pub struct Login {
@@ -34,7 +33,7 @@ impl<'a, 'r> FromRequest<'a, 'r> for User {
     type Error = std::convert::Infallible;
 
     fn from_request(request: &'a Request<'r>) -> request::Outcome<User, Self::Error> {
-        common::controller::get_current_user(request.cookies()).or_forward(())
+        controller::common::get_current_user(request.cookies()).or_forward(())
     }
 }
 
@@ -45,7 +44,7 @@ pub fn login(
     login: Form<Login>,
 ) -> Result<Redirect, Flash<Redirect>> {
     let username = &login.username.clone();
-    let recipe_user = repository::get_user(username, &connection);
+    let recipe_user = repository::user::get_user(username, &connection);
     let error = Err(Flash::error(
         Redirect::to(uri!(login_page)),
         "Login failed!",
@@ -57,11 +56,11 @@ pub fn login(
     let user = recipe_user.unwrap();
     if create_hash(&login.password) == user.password {
         cookies.add_private(Cookie::new(
-            common::controller::COOKIE_NAME,
+            controller::common::COOKIE_NAME,
             user.name.unwrap(),
         ));
         log::info!("Successful login of user {}", user.username);
-        Ok(Redirect::to(uri!(recipe::controller::recipe_list)))
+        Ok(Redirect::to(uri!(controller::recipe::recipe_list)))
     } else {
         log::info!("Failed login of user {}", user.username);
         error
@@ -70,14 +69,14 @@ pub fn login(
 
 #[post("/logout")]
 pub fn logout(mut cookies: Cookies) -> Flash<Redirect> {
-    cookies.remove_private(Cookie::named(common::controller::COOKIE_NAME));
+    cookies.remove_private(Cookie::named(controller::common::COOKIE_NAME));
     log::debug!("Successful logout of some user");
     Flash::success(Redirect::to(uri!(login_page)), "Successfully logged out.")
 }
 
 #[get("/login")]
 pub fn login_user(_user: User) -> Redirect {
-    Redirect::to(uri!(recipe::controller::recipe_list))
+    Redirect::to(uri!(controller::recipe::recipe_list))
 }
 
 fn create_common_context<'a>(
@@ -136,7 +135,7 @@ pub fn create_user(
         password: create_hash(&login_user.password),
         name: login_user.name,
     };
-    let result = repository::save_user(&recipe_user, connection);
+    let result = repository::user::save_user(&recipe_user, connection);
     match result {
         Ok(_) => {
             log::info!("Created user {}", &recipe_user.username);

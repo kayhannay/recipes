@@ -1,8 +1,8 @@
-use common::repository::RecipeDatabase;
-use common::schema::user;
 use diesel::prelude::*;
 use diesel::result::Error;
-use user::model::RecipeUser;
+use domain::user::RecipeUser;
+use repository::common::RecipeDatabase;
+use repository::schema::user;
 
 pub fn get_user(username: &str, connection: &RecipeDatabase) -> Option<RecipeUser> {
     let user = user::table
