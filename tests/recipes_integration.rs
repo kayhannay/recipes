@@ -10,8 +10,8 @@ use rocket::http::Status;
 use recipes_tool::init_application;
 use std::env;
 use chrono::Utc;
-use recipes_tool::database::RecipeDatabase;
-use recipes_tool::model::Recipe;
+use recipes_tool::common::repository::RecipeDatabase;
+use recipes_tool::recipe::model::Recipe;
 
 #[derive(Default)]
 struct MySql;
@@ -65,7 +65,7 @@ fn setup() -> (Client, RecipeDatabase) {
     // Start Rocket application, which is under test
     env::set_var("ROCKET_DATABASES", mysql_url);
     let rocket = init_application();
-    let database_connection = recipes_tool::database::RecipeDatabase::get_one(&rocket).unwrap();
+    let database_connection = RecipeDatabase::get_one(&rocket).unwrap();
     let client = Client::new(rocket).expect("valid rocket instance");
 
     (client, database_connection)
@@ -105,7 +105,7 @@ fn should_render_recipe_list() {
     // Given
     let (client, database_connection) = setup();
     let recipe = create_test_recipe();
-    recipes_tool::database::save_recipe(&recipe, database_connection);
+    recipes_tool::recipe::repository::save_recipe(&recipe, database_connection);
 
     // When
     let mut response = client.get("/").dispatch();
@@ -123,7 +123,7 @@ fn should_render_recipe() {
     // Given
     let (client, database_connection) = setup();
     let recipe = create_test_recipe();
-    recipes_tool::database::save_recipe(&recipe, database_connection);
+    recipes_tool::recipe::repository::save_recipe(&recipe, database_connection);
 
     // When
     let mut response = client.get(format!("/recipe/{}", recipe.id)).dispatch();

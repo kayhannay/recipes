@@ -7,15 +7,15 @@ use rocket::http::{Cookies, Cookie};
 use rocket::response::{Redirect, Flash};
 use std::collections::HashMap;
 use rocket_contrib::templates::Template;
-use request_handler;
-use database;
-use database::RecipeDatabase;
+use recipe;
+use common::repository::RecipeDatabase;
 use std::str;
 use self::crypto::digest::Digest;
 use self::crypto::sha2::Sha512;
-use model::RecipeUser;
-
-const COOKIE_NAME: &str = "user";
+use user::model::RecipeUser;
+use common::controller::{MessageType, User, CommonContext};
+use common;
+use user::repository;
 
 #[derive(FromForm)]
 pub struct Login {
@@ -30,29 +30,11 @@ pub struct CreateUser {
     name: Option<String>
 }
 
-#[derive(Debug, Serialize)]
-pub struct User(String);
-
-#[derive(Debug, Serialize)]
-pub enum MessageType {
-    ERROR,
-    WARN,
-    INFO,
-    None
-}
-
-#[derive(Debug, Serialize)]
-pub struct CommonContext {
-    pub current_user: Option<User>,
-    pub message: Option<String>,
-    pub message_type: MessageType
-}
-
 impl<'a, 'r> FromRequest<'a, 'r> for User {
     type Error = std::convert::Infallible;
 
     fn from_request(request: &'a Request<'r>) -> request::Outcome<User, Self::Error> {
-        get_current_user(request.cookies())
+        common::controller::get_current_user(request.cookies())
             .or_forward(())
     }
 }
@@ -60,7 +42,7 @@ impl<'a, 'r> FromRequest<'a, 'r> for User {
 #[post("/login", data = "<login>")]
 pub fn login(connection: RecipeDatabase, mut cookies: Cookies, login: Form<Login>) -> Result<Redirect, Flash<Redirect>> {
     let username = &login.username.clone();
-    let recipe_user = database::get_user(username, &connection);
+    let recipe_user = repository::get_user(username, &connection);
     let error = Err(Flash::error(Redirect::to(uri!(login_page)), "Login failed!"));
     if recipe_user.is_none() {
         log::info!("Failed login of user {}", username);
@@ -68,9 +50,9 @@ pub fn login(connection: RecipeDatabase, mut cookies: Cookies, login: Form<Login
     }
     let user = recipe_user.unwrap();
     if create_hash(&login.password) == user.password {
-        cookies.add_private(Cookie::new(COOKIE_NAME, user.name.unwrap()));
+        cookies.add_private(Cookie::new(common::controller::COOKIE_NAME, user.name.unwrap()));
         log::info!("Successful login of user {}", user.username);
-        Ok(Redirect::to(uri!(request_handler::recipe_list)))
+        Ok(Redirect::to(uri!(recipe::controller::recipe_list)))
     } else{
         log::info!("Failed login of user {}", user.username);
         error
@@ -79,14 +61,14 @@ pub fn login(connection: RecipeDatabase, mut cookies: Cookies, login: Form<Login
 
 #[post("/logout")]
 pub fn logout(mut cookies: Cookies) -> Flash<Redirect> {
-    cookies.remove_private(Cookie::named(COOKIE_NAME));
+    cookies.remove_private(Cookie::named(common::controller::COOKIE_NAME));
     log::debug!("Successful logout of some user");
     Flash::success(Redirect::to(uri!(login_page)), "Successfully logged out.")
 }
 
 #[get("/login")]
 pub fn login_user(_user: User) -> Redirect {
-    Redirect::to(uri!(request_handler::recipe_list))
+    Redirect::to(uri!(recipe::controller::recipe_list))
 }
 
 fn create_common_context<'a>(flash: Option<FlashMessage>, user: Option<User>) -> HashMap<&'a str, CommonContext> {
@@ -132,7 +114,7 @@ pub fn create_user(connection: RecipeDatabase, new_user: Form<CreateUser>) -> Re
         password: create_hash(&login_user.password),
         name: login_user.name
     };
-    let result = database::save_user(&recipe_user, connection);
+    let result = repository::save_user(&recipe_user, connection);
     match result {
         Ok(_) => {
             log::info!("Created user {}", &recipe_user.username);
@@ -140,13 +122,6 @@ pub fn create_user(connection: RecipeDatabase, new_user: Form<CreateUser>) -> Re
         },
         Err(_) => error
     }
-}
-
-pub fn get_current_user(mut cookies: Cookies) -> Option<User> {
-    cookies
-        .get_private(COOKIE_NAME)
-        .and_then(|cookie| cookie.value().parse().ok())
-        .map(User)
 }
 
 fn create_hash(input: &str) -> String {

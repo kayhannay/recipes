@@ -5,16 +5,14 @@
 #[macro_use] extern crate rocket;
 #[macro_use] extern crate diesel;
 #[macro_use] extern crate diesel_migrations;
-#[macro_use] extern crate log;
+extern crate log;
 extern crate dotenv;
 extern crate env_logger;
 extern crate chrono;
 
-mod schema;
-pub mod model;
-mod request_handler;
-pub mod database;
-mod auth;
+pub mod user;
+pub mod recipe;
+pub mod common;
 
 use rocket_contrib::templates::Template;
 use env_logger::Builder;
@@ -22,7 +20,7 @@ use chrono::Local;
 use log::LevelFilter;
 use std::io::Write;
 
-fn init_logging() {
+pub fn init_logging() {
     Builder::new()
         .format(|buf, record| {
             writeln!(buf,
@@ -37,12 +35,20 @@ fn init_logging() {
 }
 
 pub fn init_application() -> rocket::Rocket {
-    init_logging();
     dotenv::dotenv().ok();
     let rocket = rocket::ignite()
-        .mount("/", routes![request_handler::recipe_list, request_handler::recipe, auth::login, auth::login_user, auth::login_page, auth::config, auth::user_config, auth::logout, auth::create_user])
+        .mount("/", routes![
+            recipe::controller::recipe_list,
+            recipe::controller::recipe,
+            user::controller::login,
+            user::controller::login_user,
+            user::controller::login_page,
+            user::controller::config,
+            user::controller::user_config,
+            user::controller::logout,
+            user::controller::create_user])
         .attach(Template::fairing())
-        .attach(database::RecipeDatabase::fairing());
-    database::run_migrations(&*database::RecipeDatabase::get_one(&rocket).unwrap());
+        .attach(common::repository::RecipeDatabase::fairing());
+    common::repository::run_migrations(&*common::repository::RecipeDatabase::get_one(&rocket).unwrap());
     rocket
 }
