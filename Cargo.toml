@@ -1,6 +1,6 @@
 [package]
-name = "recipes-tool"
-version = "0.1.0"
+name = "recipes"
+version = "0.2.0"
 authors = ["Kay Hannay <klinux@hannay.de>"]
 
 [dependencies]

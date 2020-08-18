@@ -15,8 +15,8 @@ pub fn get_user(username: &str, connection: &RecipeDatabase) -> Option<RecipeUse
     Some(user)
 }
 
-pub fn save_user(user: &RecipeUser, connection: RecipeDatabase) -> Result<usize, Error> {
+pub fn save_user(user: &RecipeUser, connection: &RecipeDatabase) -> Result<usize, Error> {
     diesel::insert_into(user::table)
         .values(user)
-        .execute(&*connection)
+        .execute(&**connection)
 }

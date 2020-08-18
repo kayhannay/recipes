@@ -54,9 +54,10 @@ pub fn login(
     }
     let user = recipe_user.unwrap();
     if controller::common::create_hash(&login.password) == user.password {
+        let username = user.username.clone();
         cookies.add_private(Cookie::new(
             controller::common::COOKIE_NAME,
-            user.name.unwrap(),
+            user.name.unwrap_or(username),
         ));
         log::info!("Successful login of user {}", user.username);
         Ok(Redirect::to(uri!(controller::recipe::recipe_list)))

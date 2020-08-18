@@ -11,7 +11,7 @@ use rocket::response::{Flash, Redirect};
 pub struct CreateUser {
     username: String,
     password: String,
-    name: Option<String>,
+    name: String,
 }
 
 #[post("/user", data = "<new_user>")]
@@ -27,12 +27,17 @@ pub fn create_user(
     if login_user.username.is_empty() || login_user.password.is_empty() {
         return error;
     }
+    let name = if login_user.name.is_empty() {
+        None
+    } else {
+        Some(login_user.name)
+    };
     let recipe_user = RecipeUser {
         username: login_user.username,
         password: controller::common::create_hash(&login_user.password),
-        name: login_user.name,
+        name,
     };
-    let result = repository::user::save_user(&recipe_user, connection);
+    let result = repository::user::save_user(&recipe_user, &connection);
     match result {
         Ok(_) => {
             log::info!("Created user {}", &recipe_user.username);
