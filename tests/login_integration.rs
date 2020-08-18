@@ -104,7 +104,7 @@ fn should_logout() {
 
     // When
     let response = client
-        .post("/logout")
+        .get("/logout")
         .cookie(login_cookie.clone())
         .dispatch();
 

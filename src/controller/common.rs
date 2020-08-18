@@ -6,7 +6,7 @@ use std::collections::HashMap;
 
 pub const COOKIE_NAME: &str = "user";
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, PartialEq)]
 pub enum MessageType {
     ERROR,
     WARN,
@@ -14,7 +14,7 @@ pub enum MessageType {
     None,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, PartialEq, Clone)]
 pub struct User(String);
 
 #[derive(Debug, Serialize)]
@@ -55,7 +55,47 @@ pub fn create_common_context<'a>(
         };
         common.message = Some(msg.msg().to_string());
         common.message_type = message_type;
-        context.insert("common", common);
     }
+    context.insert("common", common);
     context
+}
+
+#[cfg(test)]
+mod test {
+    use super::create_common_context;
+    use controller::common::{MessageType, User};
+    use rocket::request::FlashMessage;
+    use rocket::response::{Flash, Redirect};
+    use rocket::Request;
+
+    #[test]
+    fn should_create_empty_context() {
+        // When
+        let result = create_common_context(None, None);
+
+        // Then
+        assert_eq!(result.len(), 1);
+        assert!(result.contains_key("common"));
+        let common_context = result.get("common").unwrap();
+        assert!(common_context.current_user.is_none());
+        assert!(common_context.message.is_none());
+        assert_eq!(common_context.message_type, MessageType::None);
+    }
+
+    #[test]
+    fn should_create_context_with_user() {
+        // Given
+        let user = User("foo".to_string());
+
+        // When
+        let result = create_common_context(None, Some(user.clone()));
+
+        // Then
+        assert_eq!(result.len(), 1);
+        assert!(result.contains_key("common"));
+        let common_context = result.get("common").unwrap();
+        assert_eq!(common_context.current_user, Some(user));
+        assert!(common_context.message.is_none());
+        assert_eq!(common_context.message_type, MessageType::None);
+    }
 }

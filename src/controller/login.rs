@@ -67,7 +67,7 @@ pub fn login(
     }
 }
 
-#[post("/logout")]
+#[get("/logout")]
 pub fn logout(mut cookies: Cookies) -> Flash<Redirect> {
     cookies.remove_private(Cookie::named(controller::common::COOKIE_NAME));
     log::debug!("Successful logout of some user");

@@ -1,10 +1,12 @@
 use controller;
-use controller::common::{CommonContext, MessageType};
+use controller::common::{CommonContext, MessageType, User};
 use domain::recipe::Recipe;
 use domain::recipe::RecipeName;
 use repository;
 use repository::common::RecipeDatabase;
 use rocket::http::Cookies;
+use rocket::request::FlashMessage;
+use rocket::response::Redirect;
 use rocket_contrib::templates::Template;
 
 #[get("/")]
@@ -36,6 +38,19 @@ pub fn recipe(id: i32, connection: RecipeDatabase, cookies: Cookies) -> Option<T
         },
     };
     Some(Template::render("recipe", &model))
+}
+
+#[get("/newrecipe")]
+pub fn user_new_recipe(user: User, flash: Option<FlashMessage>) -> Template {
+    Template::render(
+        "new_recipe",
+        &controller::common::create_common_context(flash, Some(user)),
+    )
+}
+
+#[get("/newrecipe", rank = 2)]
+pub fn new_recipe() -> Redirect {
+    Redirect::to(uri!(controller::login::login_page))
 }
 
 #[derive(Serialize)]

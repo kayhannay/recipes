@@ -1,13 +1,11 @@
 <a href="/">Übersicht</a>
 
 {{#if common.current_user}}
-    {{common.current_user}}
-    <form action="/logout" method="post" accept-charset="utf-8">
-        <input type="submit" name="logout" id="logout" value="logout" />
-    </form>
+    | Eingeloggt als {{common.current_user}}
+    | <a href="/logout">Logout</a>
+    | <a href="/newrecipe">Neues Rezept</a>
+    | <a href="/config">Konfiguration</a>
 {{else}}
-    <form action="/login" method="get" accept-charset="utf-8">
-        <input type="submit" name="login" id="login" value="login" />
-    </form>
+    | <a href="/login">Login</a>
 {{/if}}
 

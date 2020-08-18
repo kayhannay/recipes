@@ -49,6 +49,8 @@ pub fn init_application() -> rocket::Rocket {
             routes![
                 controller::recipe::recipe_list,
                 controller::recipe::recipe,
+                controller::recipe::new_recipe,
+                controller::recipe::user_new_recipe,
                 controller::login::login,
                 controller::login::login_user,
                 controller::login::login_page,
