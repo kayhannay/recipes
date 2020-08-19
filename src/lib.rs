@@ -10,6 +10,7 @@ extern crate rocket;
 extern crate diesel;
 #[macro_use]
 extern crate diesel_migrations;
+extern crate bigdecimal;
 extern crate chrono;
 extern crate crypto;
 extern crate dotenv;
@@ -50,6 +51,7 @@ pub fn init_application() -> rocket::Rocket {
                 controller::recipe::recipe_list,
                 controller::recipe::recipe,
                 controller::recipe::new_recipe,
+                controller::recipe::create_recipe,
                 controller::recipe::user_new_recipe,
                 controller::login::login,
                 controller::login::login_user,

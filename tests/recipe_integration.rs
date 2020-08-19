@@ -5,11 +5,10 @@ extern crate testcontainers;
 mod common;
 
 use chrono::Utc;
-use rocket::http::Status;
+use rocket::http::{ContentType, Status};
 
 fn create_test_recipe() -> recipes::domain::recipe::Recipe {
     recipes::domain::recipe::Recipe {
-        id: 123,
         name: "Test Recipe".to_string(),
         ingredients: "Some sugar".to_string(),
         preparation: "Boil it.".to_string(),
@@ -44,7 +43,9 @@ fn should_render_recipe_list() {
     // Given
     let (client, database_connection) = common::setup();
     let recipe = create_test_recipe();
-    recipes::repository::recipe::save_recipe(&recipe, database_connection);
+    recipes::repository::recipe::save_recipe(&recipe, &database_connection);
+    let recipes = recipes::repository::recipe::get_recipes(&database_connection);
+    let recipe_id = recipes.get(0).unwrap().id;
 
     // When
     let mut response = client.get("/").dispatch();
@@ -53,7 +54,7 @@ fn should_render_recipe_list() {
     assert_eq!(response.status(), Status::Ok);
     assert!(response.body_string().unwrap().contains(&format!(
         "<li class=\"recipe\"><a href=\"/recipe/{}\">{}</a></li>",
-        recipe.id, recipe.name
+        recipe_id, recipe.name
     )));
 }
 
@@ -62,10 +63,12 @@ fn should_render_recipe() {
     // Given
     let (client, database_connection) = common::setup();
     let recipe = create_test_recipe();
-    recipes::repository::recipe::save_recipe(&recipe, database_connection);
+    recipes::repository::recipe::save_recipe(&recipe, &database_connection);
+    let recipes = recipes::repository::recipe::get_recipes(&database_connection);
+    let recipe_id = recipes.get(0).unwrap().id;
 
     // When
-    let mut response = client.get(format!("/recipe/{}", recipe.id)).dispatch();
+    let mut response = client.get(format!("/recipe/{}", recipe_id)).dispatch();
 
     // Then
     assert_eq!(response.status(), Status::Ok);
@@ -125,4 +128,42 @@ fn should_render_new_recipe_form() {
         .body_string()
         .unwrap()
         .contains("<title>Rezept - Neu</title>"));
+}
+
+#[test]
+fn should_create_recipe() {
+    // Given
+    let (client, database_connection) = common::setup();
+    let password = "geheim";
+    let user = recipes::domain::user::RecipeUser {
+        username: "testuser".to_string(),
+        password: recipes::controller::common::create_hash(password),
+        name: None,
+    };
+    recipes::repository::user::save_user(&user, &database_connection).ok();
+    let login_cookie = common::login(&client, &user.username, password).expect("logged in");
+    let test_recipe = create_test_recipe();
+
+    // When
+    let mut response = client
+        .post("/recipe")
+        .cookie(login_cookie.clone())
+        .header(ContentType::Form)
+        .body(format!(
+            "name={}&ingredients={}&preparation={}",
+            test_recipe.name, test_recipe.ingredients, test_recipe.preparation
+        ))
+        .dispatch();
+
+    // Then
+    assert_eq!(response.status(), Status::SeeOther);
+    assert_eq!(response.headers().get_one("Location"), Some("/"));
+    let recipes = recipes::repository::recipe::get_recipes(&database_connection);
+    assert_eq!(recipes.len(), 1);
+    let result_recipe =
+        recipes::repository::recipe::get_recipe(recipes.get(0).unwrap().id, &database_connection)
+            .unwrap();
+    assert_eq!(result_recipe.name, test_recipe.name);
+    assert_eq!(result_recipe.ingredients, test_recipe.ingredients);
+    assert_eq!(result_recipe.preparation, test_recipe.preparation);
 }
