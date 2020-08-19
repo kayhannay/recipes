@@ -1,7 +1,7 @@
 extern crate crypto;
 
 use controller;
-use domain::user::RecipeUser;
+use domain::user::NewRecipeUser;
 use repository;
 use repository::common::RecipeDatabase;
 use rocket::request::Form;
@@ -32,7 +32,7 @@ pub fn create_user(
     } else {
         Some(login_user.name)
     };
-    let recipe_user = RecipeUser {
+    let recipe_user = NewRecipeUser {
         username: login_user.username,
         password: controller::common::create_hash(&login_user.password),
         name,

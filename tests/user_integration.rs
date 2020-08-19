@@ -10,7 +10,7 @@ use rocket::http::{ContentType, Status};
 fn should_create_user() {
     // Given
     let (client, database_connection) = common::setup();
-    let user = recipes::domain::user::RecipeUser {
+    let user = recipes::domain::user::NewRecipeUser {
         username: "testuser".to_string(),
         password: "geheim".to_string(),
         name: Some("Paul".to_string()),
@@ -46,7 +46,7 @@ fn should_create_user() {
 fn should_not_create_user_no_username() {
     // Given
     let (client, database_connection) = common::setup();
-    let user = recipes::domain::user::RecipeUser {
+    let user = recipes::domain::user::NewRecipeUser {
         username: "".to_string(),
         password: "geheim".to_string(),
         name: Some("Paul".to_string()),
@@ -80,7 +80,7 @@ fn should_not_create_user_no_username() {
 fn should_not_create_user_no_password() {
     // Given
     let (client, database_connection) = common::setup();
-    let user = recipes::domain::user::RecipeUser {
+    let user = recipes::domain::user::NewRecipeUser {
         username: "testuser".to_string(),
         password: "".to_string(),
         name: Some("Paul".to_string()),
@@ -114,7 +114,7 @@ fn should_not_create_user_no_password() {
 fn should_create_user_no_name() {
     // Given
     let (client, database_connection) = common::setup();
-    let user = recipes::domain::user::RecipeUser {
+    let user = recipes::domain::user::NewRecipeUser {
         username: "testuser".to_string(),
         password: "geheim".to_string(),
         name: None,
@@ -148,7 +148,7 @@ fn should_create_user_no_name() {
 fn should_not_create_user_long_username() {
     // Given
     let (client, database_connection) = common::setup();
-    let user = recipes::domain::user::RecipeUser {
+    let user = recipes::domain::user::NewRecipeUser {
         username: "testusertestusertestusertestusertestusertestusertestusertestusertestusertestusertestusertestusertestusertestusertestusertestusertestusertestusertestusertestusertestusertestusertestusertestusertestusertestusertestusertestusertestusertestusertestusertestusertestusertestusertestusertestusertestusertestusertestusertestusertestusertestusertestusertestusertestusertestusertestusertestusertestusertestusertestusertestusertestusertestusertestusertestusertestusertestusertestusertestusertestusertestusertestusertestusertestusertestusertestusertestusertestusertestusertestusertestusertestusertestusertestusertestusertestusertestuser".to_string(),
         password: "geheim".to_string(),
         name: Some("Paul".to_string()),

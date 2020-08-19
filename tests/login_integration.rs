@@ -26,7 +26,7 @@ fn should_login_by_cookie() {
     // Given
     let (client, database_connection) = common::setup();
     let password = "geheim";
-    let user = recipes::domain::user::RecipeUser {
+    let user = recipes::domain::user::NewRecipeUser {
         username: "testuser".to_string(),
         password: recipes::controller::common::create_hash(password),
         name: None,
@@ -47,7 +47,7 @@ fn should_login() {
     // Given
     let (client, database_connection) = common::setup();
     let password = "geheim";
-    let user = recipes::domain::user::RecipeUser {
+    let user = recipes::domain::user::NewRecipeUser {
         username: "testuser".to_string(),
         password: recipes::controller::common::create_hash(password),
         name: None,
@@ -70,7 +70,7 @@ fn should_login() {
 fn should_fail_login() {
     // Given
     let (client, database_connection) = common::setup();
-    let user = recipes::domain::user::RecipeUser {
+    let user = recipes::domain::user::NewRecipeUser {
         username: "testuser".to_string(),
         password: recipes::controller::common::create_hash("geheim"),
         name: None,
@@ -94,7 +94,7 @@ fn should_logout() {
     // Given
     let (client, database_connection) = common::setup();
     let password = "geheim";
-    let user = recipes::domain::user::RecipeUser {
+    let user = recipes::domain::user::NewRecipeUser {
         username: "testuser".to_string(),
         password: recipes::controller::common::create_hash(password),
         name: None,

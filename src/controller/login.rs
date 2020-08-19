@@ -44,25 +44,29 @@ pub fn login(
 ) -> Result<Redirect, Flash<Redirect>> {
     let username = &login.username.clone();
     let recipe_user = repository::user::get_user(username, &connection);
+    println!("User from DB: {:?}", recipe_user);
     let error = Err(Flash::error(
         Redirect::to(uri!(login_page)),
         "Login failed!",
     ));
     if recipe_user.is_none() {
-        log::info!("Failed login of user {}", username);
+        log::info!("Failed login of user {}, not found", username);
         return error;
     }
-    let user = recipe_user.unwrap();
+    let user = recipe_user.clone().unwrap();
+    let cookie_user = recipe_user
+        .map(|user| User {
+            name: user.name.unwrap_or(user.username),
+            uid: user.uid,
+        })
+        .unwrap();
     if controller::common::create_hash(&login.password) == user.password {
-        let username = user.username.clone();
-        cookies.add_private(Cookie::new(
-            controller::common::COOKIE_NAME,
-            user.name.unwrap_or(username),
-        ));
-        log::info!("Successful login of user {}", user.username);
+        let cookie_value = serde_json::to_string(&cookie_user).ok().unwrap();
+        cookies.add_private(Cookie::new(controller::common::COOKIE_NAME, cookie_value));
+        log::info!("Successful login of user {}", username);
         Ok(Redirect::to(uri!(controller::recipe::recipe_list)))
     } else {
-        log::info!("Failed login of user {}", user.username);
+        log::info!("Failed login of user {}", username);
         error
     }
 }

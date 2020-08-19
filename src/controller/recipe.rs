@@ -1,3 +1,4 @@
+use bigdecimal::BigDecimal;
 use chrono::Utc;
 use controller;
 use controller::common::{CommonContext, MessageType, User};
@@ -50,7 +51,7 @@ pub fn recipe(id: i32, connection: RecipeDatabase, cookies: Cookies) -> Option<T
 
 #[post("/recipe", data = "<new_recipe>")]
 pub fn create_recipe(
-    _user: User,
+    user: User,
     new_recipe: Form<CreateRecipe>,
     connection: RecipeDatabase,
 ) -> Result<Flash<Redirect>, Flash<Redirect>> {
@@ -63,7 +64,7 @@ pub fn create_recipe(
         experience: None,
         created: Utc::now().naive_utc(),
         rights: None,
-        owner: None,
+        owner: Some(BigDecimal::from(user.uid)),
         time_need: None,
     };
     let _ = repository::recipe::save_recipe(&new_recipe, &connection);

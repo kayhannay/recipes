@@ -12,7 +12,7 @@ fn should_render_config_page() {
     // Given
     let (client, database_connection) = common::setup();
     let password = "geheim";
-    let user = recipes::domain::user::RecipeUser {
+    let user = recipes::domain::user::NewRecipeUser {
         username: "testuser".to_string(),
         password: recipes::controller::common::create_hash(password),
         name: None,

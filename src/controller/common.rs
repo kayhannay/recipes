@@ -14,8 +14,11 @@ pub enum MessageType {
     None,
 }
 
-#[derive(Debug, Serialize, PartialEq, Clone)]
-pub struct User(String);
+#[derive(Debug, Serialize, Deserialize, PartialEq, Clone)]
+pub struct User {
+    pub name: String,
+    pub uid: i32,
+}
 
 #[derive(Debug, Serialize)]
 pub struct CommonContext {
@@ -27,8 +30,8 @@ pub struct CommonContext {
 pub fn get_current_user(mut cookies: Cookies) -> Option<User> {
     cookies
         .get_private(COOKIE_NAME)
-        .and_then(|cookie| cookie.value().parse().ok())
-        .map(User)
+        .and_then(|cookie| cookie.value().parse::<String>().ok())
+        .map(|value| serde_json::from_str(&value).unwrap())
 }
 
 pub fn create_hash(input: &str) -> String {
@@ -64,9 +67,6 @@ pub fn create_common_context<'a>(
 mod test {
     use super::create_common_context;
     use controller::common::{MessageType, User};
-    use rocket::request::FlashMessage;
-    use rocket::response::{Flash, Redirect};
-    use rocket::Request;
 
     #[test]
     fn should_create_empty_context() {
@@ -85,7 +85,10 @@ mod test {
     #[test]
     fn should_create_context_with_user() {
         // Given
-        let user = User("foo".to_string());
+        let user = User {
+            name: "foo".to_string(),
+            uid: 0,
+        };
 
         // When
         let result = create_common_context(None, Some(user.clone()));

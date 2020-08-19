@@ -1,9 +1,12 @@
+extern crate bigdecimal;
 extern crate chrono;
+extern crate recipes;
 extern crate rocket;
 extern crate testcontainers;
 
 mod common;
 
+use bigdecimal::BigDecimal;
 use chrono::Utc;
 use rocket::http::{ContentType, Status};
 
@@ -43,7 +46,7 @@ fn should_render_recipe_list() {
     // Given
     let (client, database_connection) = common::setup();
     let recipe = create_test_recipe();
-    recipes::repository::recipe::save_recipe(&recipe, &database_connection);
+    recipes::repository::recipe::save_recipe(&recipe, &database_connection).ok();
     let recipes = recipes::repository::recipe::get_recipes(&database_connection);
     let recipe_id = recipes.get(0).unwrap().id;
 
@@ -63,7 +66,7 @@ fn should_render_recipe() {
     // Given
     let (client, database_connection) = common::setup();
     let recipe = create_test_recipe();
-    recipes::repository::recipe::save_recipe(&recipe, &database_connection);
+    recipes::repository::recipe::save_recipe(&recipe, &database_connection).ok();
     let recipes = recipes::repository::recipe::get_recipes(&database_connection);
     let recipe_id = recipes.get(0).unwrap().id;
 
@@ -108,7 +111,7 @@ fn should_render_new_recipe_form() {
     // Given
     let (client, database_connection) = common::setup();
     let password = "geheim";
-    let user = recipes::domain::user::RecipeUser {
+    let user = recipes::domain::user::NewRecipeUser {
         username: "testuser".to_string(),
         password: recipes::controller::common::create_hash(password),
         name: None,
@@ -135,17 +138,19 @@ fn should_create_recipe() {
     // Given
     let (client, database_connection) = common::setup();
     let password = "geheim";
-    let user = recipes::domain::user::RecipeUser {
+    let user = recipes::domain::user::NewRecipeUser {
         username: "testuser".to_string(),
         password: recipes::controller::common::create_hash(password),
         name: None,
     };
     recipes::repository::user::save_user(&user, &database_connection).ok();
     let login_cookie = common::login(&client, &user.username, password).expect("logged in");
+    let db_user =
+        recipes::repository::user::get_user(&user.username, &database_connection).unwrap();
     let test_recipe = create_test_recipe();
 
     // When
-    let mut response = client
+    let response = client
         .post("/recipe")
         .cookie(login_cookie.clone())
         .header(ContentType::Form)
@@ -166,4 +171,5 @@ fn should_create_recipe() {
     assert_eq!(result_recipe.name, test_recipe.name);
     assert_eq!(result_recipe.ingredients, test_recipe.ingredients);
     assert_eq!(result_recipe.preparation, test_recipe.preparation);
+    assert_eq!(result_recipe.owner, Some(BigDecimal::from(db_user.uid)));
 }
