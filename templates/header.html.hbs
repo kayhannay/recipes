@@ -1,7 +1,7 @@
 <a href="/">Übersicht</a>
 
 {{#if common.current_user}}
-    | Eingeloggt als {{common.current_user}}
+    | Eingeloggt als {{common.current_user.name}}
     | <a href="/logout">Logout</a>
     | <a href="/newrecipe">Neues Rezept</a>
     | <a href="/config">Konfiguration</a>
