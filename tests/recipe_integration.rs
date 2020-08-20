@@ -7,18 +7,16 @@ extern crate testcontainers;
 mod common;
 
 use bigdecimal::BigDecimal;
-use chrono::Utc;
 use rocket::http::{ContentType, Status};
 
-fn create_test_recipe() -> recipes::domain::recipe::Recipe {
-    recipes::domain::recipe::Recipe {
+fn create_test_recipe() -> recipes::domain::recipe::NewRecipe {
+    recipes::domain::recipe::NewRecipe {
         name: "Test Recipe".to_string(),
         ingredients: "Some sugar".to_string(),
         preparation: "Boil it.".to_string(),
         experience: None,
         time_need: None,
         number_people: None,
-        created: Utc::now().naive_utc(),
         owner: None,
         rights: None,
         category: None,

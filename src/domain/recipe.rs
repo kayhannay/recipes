@@ -20,6 +20,20 @@ pub struct Recipe {
     pub time_need: Option<String>,
 }
 
+#[derive(Debug, Queryable, Insertable, Serialize, Deserialize, Clone)]
+#[table_name = "rezepte"]
+pub struct NewRecipe {
+    pub name: String,
+    pub ingredients: String,
+    pub preparation: String,
+    pub category: Option<i32>,
+    pub number_people: Option<BigDecimal>,
+    pub experience: Option<String>,
+    pub rights: Option<BigDecimal>,
+    pub owner: Option<BigDecimal>,
+    pub time_need: Option<String>,
+}
+
 #[derive(Debug, Queryable, Serialize)]
 pub struct RecipeName {
     pub id: i32,

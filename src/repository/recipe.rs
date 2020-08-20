@@ -1,5 +1,5 @@
 use diesel::prelude::*;
-use domain::recipe::{Recipe, RecipeName};
+use domain::recipe::{NewRecipe, Recipe, RecipeName};
 use repository::common::RecipeDatabase;
 use repository::schema::rezepte;
 
@@ -33,7 +33,7 @@ pub fn get_recipe(id: i32, connection: &RecipeDatabase) -> Option<Recipe> {
     Some(recipe)
 }
 
-pub fn save_recipe(recipe: &Recipe, connection: &RecipeDatabase) -> QueryResult<usize> {
+pub fn save_recipe(recipe: &NewRecipe, connection: &RecipeDatabase) -> QueryResult<usize> {
     diesel::insert_into(rezepte::table)
         .values(recipe)
         .execute(&**connection)

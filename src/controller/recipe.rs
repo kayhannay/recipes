@@ -1,9 +1,8 @@
 use bigdecimal::BigDecimal;
-use chrono::Utc;
 use controller;
 use controller::common::{CommonContext, MessageType, User};
-use domain::recipe::Recipe;
 use domain::recipe::RecipeName;
+use domain::recipe::{NewRecipe, Recipe};
 use repository;
 use repository::common::RecipeDatabase;
 use rocket::http::Cookies;
@@ -55,14 +54,13 @@ pub fn create_recipe(
     new_recipe: Form<CreateRecipe>,
     connection: RecipeDatabase,
 ) -> Result<Flash<Redirect>, Flash<Redirect>> {
-    let new_recipe = Recipe {
+    let new_recipe = NewRecipe {
         name: new_recipe.0.name,
         ingredients: new_recipe.0.ingredients,
         preparation: new_recipe.0.preparation,
         category: None,
         number_people: None,
         experience: None,
-        created: Utc::now().naive_utc(),
         rights: None,
         owner: Some(BigDecimal::from(user.uid)),
         time_need: None,
