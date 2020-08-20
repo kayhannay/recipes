@@ -1,6 +1,6 @@
 table! {
-    categories (cid) {
-        cid -> Integer,
+    categories (id) {
+        id -> Integer,
         name -> Varchar,
     }
 }

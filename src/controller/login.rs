@@ -44,7 +44,6 @@ pub fn login(
 ) -> Result<Redirect, Flash<Redirect>> {
     let username = &login.username.clone();
     let recipe_user = repository::user::get_user(username, &connection);
-    println!("User from DB: {:?}", recipe_user);
     let error = Err(Flash::error(
         Redirect::to(uri!(login_page)),
         "Login failed!",

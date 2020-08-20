@@ -12,11 +12,16 @@
     </head>
     <body>
         {{> header }}
+        <h1>Rezept</h1>
         <div id="recipe-details">
-            <h3>{{recipe.name}}</h3>
+            <p id="recipe-catrgory"><b>Kategorie:</b> {{recipe.category}}</p>
+            <h2 id="recipe-name">{{recipe.name}}</h2>
+            <b>Zutaten</b><br/>
             <p id="recipe-ingredients">{{{recipe.ingredients}}}</p>
+            <b>Zubereitung</b><br/>
             <p id="recipe-preparation">{{{recipe.preparation}}}</p>
-            <p>{{recipe.created}}</p>
+            <p id="recipe-people"><b>Anzahl Personen:</b> {{recipe.number_people}}</p>
+            <p id="recipe-created"><b>vom:</b> {{recipe.created}}</p>
         </div>
     </body>
 </html>

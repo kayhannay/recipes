@@ -56,10 +56,11 @@ pub fn setup() -> (Client, recipes::repository::common::RecipeDatabase) {
     // Start MySQL Docker container
     let docker = clients::Cli::default();
     let container = docker.run(MySql);
-    let mysql_port = container.get_host_port(3306);
+    let mysql_port = container.get_host_port(3306).unwrap();
+    println!("Test database port: {}", mysql_port);
     let mysql_url = format!(
         "{{recipe_db={{url=\"mysql://rezepte:rezepte-secret@127.0.0.1:{}/rezepte\"}}}}",
-        mysql_port.unwrap()
+        mysql_port
     );
 
     // Start Rocket application, which is under test

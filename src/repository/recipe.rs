@@ -1,31 +1,36 @@
 use diesel::prelude::*;
 use domain::recipe::{NewRecipe, Recipe, RecipeName};
+use repository;
 use repository::common::RecipeDatabase;
+use repository::schema::categories;
 use repository::schema::rezepte;
 
 pub fn get_recipes(connection: &RecipeDatabase) -> Vec<RecipeName> {
     let recipe_list: Vec<RecipeName> = rezepte::table
-        .select((rezepte::id, rezepte::name))
+        .select((rezepte::id, rezepte::name, rezepte::category))
         .load::<RecipeName>(&**connection)
         .unwrap();
     recipe_list
 }
 
+joinable!(rezepte -> categories (category));
+
 pub fn get_recipe(id: i32, connection: &RecipeDatabase) -> Option<Recipe> {
-    let recipe = rezepte::table
+    let recipe = repository::schema::categories::dsl::categories
+        .inner_join(repository::schema::rezepte::dsl::rezepte)
         .select((
-            rezepte::name,
-            rezepte::ingredients,
-            rezepte::preparation,
-            rezepte::category,
-            rezepte::number_people,
-            rezepte::experience,
-            rezepte::created,
-            rezepte::rights,
-            rezepte::owner,
-            rezepte::time_need,
+            repository::schema::rezepte::name,
+            repository::schema::rezepte::ingredients,
+            repository::schema::rezepte::preparation,
+            repository::schema::categories::name,
+            repository::schema::rezepte::number_people,
+            repository::schema::rezepte::experience,
+            repository::schema::rezepte::created,
+            repository::schema::rezepte::rights,
+            repository::schema::rezepte::owner,
+            repository::schema::rezepte::time_need,
         ))
-        .filter(rezepte::id.eq(id))
+        .filter(repository::schema::rezepte::id.eq(id))
         .load::<Recipe>(&**connection)
         .unwrap()
         .first()?

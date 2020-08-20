@@ -15,6 +15,7 @@ pub struct CreateRecipe {
     name: String,
     ingredients: String,
     preparation: String,
+    category: String,
 }
 
 #[get("/")]
@@ -58,7 +59,7 @@ pub fn create_recipe(
         name: new_recipe.0.name,
         ingredients: new_recipe.0.ingredients,
         preparation: new_recipe.0.preparation,
-        category: None,
+        category: Some(new_recipe.0.category.parse::<i32>().unwrap()),
         number_people: None,
         experience: None,
         rights: None,

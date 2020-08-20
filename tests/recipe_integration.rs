@@ -7,9 +7,22 @@ extern crate testcontainers;
 mod common;
 
 use bigdecimal::BigDecimal;
+use recipes::domain::category::NewCategory;
+use recipes::repository::common::RecipeDatabase;
 use rocket::http::{ContentType, Status};
 
-fn create_test_recipe() -> recipes::domain::recipe::NewRecipe {
+fn create_test_recipe(database_connection: &RecipeDatabase) -> recipes::domain::recipe::NewRecipe {
+    recipes::repository::category::save_category(
+        &NewCategory {
+            name: "Testcategory".to_string(),
+        },
+        &database_connection,
+    )
+    .ok();
+    let categories = recipes::repository::category::get_categories(&database_connection);
+    println!("Categories: {:?}", categories);
+    let category = categories.get(0).unwrap();
+    println!("Category: {:?}", Option::from(category.id));
     recipes::domain::recipe::NewRecipe {
         name: "Test Recipe".to_string(),
         ingredients: "Some sugar".to_string(),
@@ -19,7 +32,7 @@ fn create_test_recipe() -> recipes::domain::recipe::NewRecipe {
         number_people: None,
         owner: None,
         rights: None,
-        category: None,
+        category: Some(category.id),
     }
 }
 
@@ -43,7 +56,7 @@ fn should_render_empty_recipe_list() {
 fn should_render_recipe_list() {
     // Given
     let (client, database_connection) = common::setup();
-    let recipe = create_test_recipe();
+    let recipe = create_test_recipe(&database_connection);
     recipes::repository::recipe::save_recipe(&recipe, &database_connection).ok();
     let recipes = recipes::repository::recipe::get_recipes(&database_connection);
     let recipe_id = recipes.get(0).unwrap().id;
@@ -63,7 +76,7 @@ fn should_render_recipe_list() {
 fn should_render_recipe() {
     // Given
     let (client, database_connection) = common::setup();
-    let recipe = create_test_recipe();
+    let recipe = create_test_recipe(&database_connection);
     recipes::repository::recipe::save_recipe(&recipe, &database_connection).ok();
     let recipes = recipes::repository::recipe::get_recipes(&database_connection);
     let recipe_id = recipes.get(0).unwrap().id;
@@ -76,7 +89,7 @@ fn should_render_recipe() {
     assert!(response
         .body_string()
         .unwrap()
-        .contains(&format!("<h3>{}</h3>", recipe.name)));
+        .contains(&format!("<h2 id=\"recipe-name\">{}</h2>", recipe.name)));
 }
 
 #[test]
@@ -145,7 +158,7 @@ fn should_create_recipe() {
     let login_cookie = common::login(&client, &user.username, password).expect("logged in");
     let db_user =
         recipes::repository::user::get_user(&user.username, &database_connection).unwrap();
-    let test_recipe = create_test_recipe();
+    let test_recipe = create_test_recipe(&database_connection);
 
     // When
     let response = client
@@ -153,8 +166,11 @@ fn should_create_recipe() {
         .cookie(login_cookie.clone())
         .header(ContentType::Form)
         .body(format!(
-            "name={}&ingredients={}&preparation={}",
-            test_recipe.name, test_recipe.ingredients, test_recipe.preparation
+            "name={}&ingredients={}&preparation={}&category={}",
+            test_recipe.name,
+            test_recipe.ingredients,
+            test_recipe.preparation,
+            test_recipe.category.unwrap()
         ))
         .dispatch();
 
@@ -163,6 +179,7 @@ fn should_create_recipe() {
     assert_eq!(response.headers().get_one("Location"), Some("/"));
     let recipes = recipes::repository::recipe::get_recipes(&database_connection);
     assert_eq!(recipes.len(), 1);
+    println!("Recipes: {:?}", recipes);
     let result_recipe =
         recipes::repository::recipe::get_recipe(recipes.get(0).unwrap().id, &database_connection)
             .unwrap();
