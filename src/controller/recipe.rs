@@ -1,14 +1,16 @@
 use bigdecimal::BigDecimal;
 use controller;
 use controller::common::{CommonContext, MessageType, User};
+use domain::category::Category;
 use domain::recipe::RecipeName;
 use domain::recipe::{NewRecipe, Recipe};
 use repository;
 use repository::common::RecipeDatabase;
 use rocket::http::Cookies;
-use rocket::request::{FlashMessage, Form};
+use rocket::request::Form;
 use rocket::response::{Flash, Redirect};
 use rocket_contrib::templates::Template;
+use std::str::FromStr;
 
 #[derive(FromForm)]
 pub struct CreateRecipe {
@@ -16,6 +18,7 @@ pub struct CreateRecipe {
     ingredients: String,
     preparation: String,
     category: String,
+    number_people: String,
 }
 
 #[get("/")]
@@ -60,7 +63,7 @@ pub fn create_recipe(
         ingredients: new_recipe.0.ingredients,
         preparation: new_recipe.0.preparation,
         category: Some(new_recipe.0.category.parse::<i32>().unwrap()),
-        number_people: None,
+        number_people: Some(BigDecimal::from_str(&new_recipe.0.number_people).unwrap()),
         experience: None,
         rights: None,
         owner: Some(BigDecimal::from(user.uid)),
@@ -74,11 +77,17 @@ pub fn create_recipe(
 }
 
 #[get("/newrecipe")]
-pub fn user_new_recipe(user: User, flash: Option<FlashMessage>) -> Template {
-    Template::render(
-        "new_recipe",
-        &controller::common::create_common_context(flash, Some(user)),
-    )
+pub fn user_new_recipe(current_user: User, connection: RecipeDatabase) -> Template {
+    let categories = repository::category::get_categories(&connection);
+    let context = NewRecipeModel {
+        categories,
+        common: CommonContext {
+            current_user: Some(current_user),
+            message: None,
+            message_type: MessageType::None,
+        },
+    };
+    Template::render("new_recipe", &context)
 }
 
 #[get("/newrecipe", rank = 2)]
@@ -95,6 +104,12 @@ struct RecipeOverviewModel {
 #[derive(Serialize)]
 struct RecipeModel {
     recipe: Recipe,
+    common: CommonContext,
+}
+
+#[derive(Serialize)]
+struct NewRecipeModel {
+    categories: Vec<Category>,
     common: CommonContext,
 }
 

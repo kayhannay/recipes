@@ -11,25 +11,25 @@ use recipes::domain::category::NewCategory;
 use recipes::repository::common::RecipeDatabase;
 use rocket::http::{ContentType, Status};
 
+const TEST_CATEGORY: &str = "Testcategory";
+
 fn create_test_recipe(database_connection: &RecipeDatabase) -> recipes::domain::recipe::NewRecipe {
     recipes::repository::category::save_category(
         &NewCategory {
-            name: "Testcategory".to_string(),
+            name: String::from(TEST_CATEGORY),
         },
         &database_connection,
     )
     .ok();
     let categories = recipes::repository::category::get_categories(&database_connection);
-    println!("Categories: {:?}", categories);
     let category = categories.get(0).unwrap();
-    println!("Category: {:?}", Option::from(category.id));
     recipes::domain::recipe::NewRecipe {
         name: "Test Recipe".to_string(),
         ingredients: "Some sugar".to_string(),
         preparation: "Boil it.".to_string(),
         experience: None,
         time_need: None,
-        number_people: None,
+        number_people: Some(BigDecimal::from(4)),
         owner: None,
         rights: None,
         category: Some(category.id),
@@ -159,6 +159,7 @@ fn should_create_recipe() {
     let db_user =
         recipes::repository::user::get_user(&user.username, &database_connection).unwrap();
     let test_recipe = create_test_recipe(&database_connection);
+    let number_people = test_recipe.number_people.unwrap();
 
     // When
     let response = client
@@ -166,11 +167,12 @@ fn should_create_recipe() {
         .cookie(login_cookie.clone())
         .header(ContentType::Form)
         .body(format!(
-            "name={}&ingredients={}&preparation={}&category={}",
+            "name={}&ingredients={}&preparation={}&category={}&number_people={}",
             test_recipe.name,
             test_recipe.ingredients,
             test_recipe.preparation,
-            test_recipe.category.unwrap()
+            test_recipe.category.unwrap(),
+            number_people,
         ))
         .dispatch();
 
@@ -186,5 +188,7 @@ fn should_create_recipe() {
     assert_eq!(result_recipe.name, test_recipe.name);
     assert_eq!(result_recipe.ingredients, test_recipe.ingredients);
     assert_eq!(result_recipe.preparation, test_recipe.preparation);
+    assert_eq!(result_recipe.category, TEST_CATEGORY);
+    assert_eq!(result_recipe.number_people, Some(number_people));
     assert_eq!(result_recipe.owner, Some(BigDecimal::from(db_user.uid)));
 }

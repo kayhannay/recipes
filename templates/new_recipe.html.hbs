@@ -13,14 +13,21 @@
     <p>{{#if common.message_type}}{{common.message_type}}: {{/if}}{{ common.message }}</p>
 {{/if}}
 
-<form action="/newrecipe" method="post" accept-charset="utf-8">
-    <label for="name">Name</label><br/>
-    <input type="text" name="name" id="name" value="" /><br/>
+<form action="/recipe" method="post" accept-charset="utf-8">
+    <label for="category">Kategorie</label>
+    <select id="category" name="category">
+        {{#each categories}}
+        <option value="{{this.id}}">{{this.name}}</option>
+        {{/each}}
+    </select><br/>
+    <label for="name">Name</label>
+    <input type="text" name="name" id="name"/><br/>
     <label for="ingredients">Zutaten</label><br/>
     <textarea name="ingredients" cols="50" rows="10"></textarea><br/>
     <label for="preparation">Zubereitung</label><br/>
-    <textarea name="preparation" cols="50" rows="10"></textarea>
-    <input type="text" name="category" id="category" value="0" /><br/>
+    <textarea name="preparation" cols="50" rows="10"></textarea><br/>
+    <label for="number_people">Anzahl Personen</label>
+    <input type="text" name="number_people" id="number_people"/><br/>
     <p><input type="submit" value="save"></p>
 </form>
 </body>
