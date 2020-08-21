@@ -4,28 +4,47 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width" />
     <title>Rezepte - konfiguration</title>
+    <style>
+        body {
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        #configuration {
+            border: 3px solid #0000A0;
+            background-color: #DCDCFF;
+            padding: 1em;
+        }
+    </style>
 </head>
 <body>
 {{> header }}
 
 <h1>Rezepte: Konfiguration</h1>
 
-<p>Dies ist die Konfigurationsseite.</p>
+<div id="configuration">
+    <h2>Benutzer hinzufügen</h2>
+    <form action="/user" method="post" accept-charset="utf-8">
+        <table>
+            <tr>
+                <td><label for="username">Benutzername</label></td>
+                <td><input type="text" name="username" id="username" value="" /></td>
+            </tr>
+            <tr>
+                <td><label for="password">Passwort</label></td>
+                <td><input type="password" name="password" id="password" value="" /></td>
+            </tr>
+            <tr>
+                <td><label for="name">Name</label></td>
+                <td><input type="text" name="name" id="name" value="" /></td>
+            </tr>
+        </table>
+        <p><input type="submit" value="Erstellen"></p>
+    </form>
 
-<h2>Add a new user</h2>
-<form action="/user" method="post" accept-charset="utf-8">
-    <label for="username">username</label>
-    <input type="text" name="username" id="username" value="" />
-    <label for="password">password</label>
-    <input type="password" name="password" id="password" value="" />
-    <label for="name">Name</label>
-    <input type="text" name="name" id="name" value="" />
-    <p><input type="submit" value="create"></p>
-</form>
-
-{{#if common.message}}
-    <p>{{#if common.message_type}}{{common.message_type}}: {{/if}}{{ common.message }}</p>
-{{/if}}
-
+    {{#if common.message}}
+        <p>{{#if common.message_type}}{{common.message_type}}: {{/if}}{{ common.message }}</p>
+    {{/if}}
+</div>
 </body>
 </html>

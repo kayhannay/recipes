@@ -4,6 +4,18 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width" />
     <title>Rezept - Neu</title>
+    <style>
+        body {
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        #recipe-form {
+            border: 3px solid #0000A0;
+            background-color: #DCDCFF;
+            padding: 1em;
+        }
+    </style>
 </head>
 <body>
 {{> header }}
@@ -13,22 +25,34 @@
     <p>{{#if common.message_type}}{{common.message_type}}: {{/if}}{{ common.message }}</p>
 {{/if}}
 
-<form action="/recipe" method="post" accept-charset="utf-8">
-    <label for="category">Kategorie</label>
-    <select id="category" name="category">
-        {{#each categories}}
-        <option value="{{this.id}}">{{this.name}}</option>
-        {{/each}}
-    </select><br/>
-    <label for="name">Name</label>
-    <input type="text" name="name" id="name"/><br/>
-    <label for="ingredients">Zutaten</label><br/>
-    <textarea name="ingredients" cols="50" rows="10"></textarea><br/>
-    <label for="preparation">Zubereitung</label><br/>
-    <textarea name="preparation" cols="50" rows="10"></textarea><br/>
-    <label for="number_people">Anzahl Personen</label>
-    <input type="text" name="number_people" id="number_people"/><br/>
-    <p><input type="submit" value="save"></p>
-</form>
+<div id="recipe-form">
+    <form action="/recipe" method="post" accept-charset="utf-8">
+        <p>
+            <label for="category">Kategorie</label>
+            <select id="category" name="category">
+                {{#each categories}}
+                <option value="{{this.id}}">{{this.name}}</option>
+                {{/each}}
+            </select>
+        </p>
+        <p>
+        <label for="name">Name</label>
+        <input type="text" name="name" id="name" size="50" maxlength="50"/><br/>
+        </p>
+        <p>
+        <label for="ingredients">Zutaten</label><br/>
+        <textarea name="ingredients" cols="80" rows="10"></textarea><br/>
+        </p>
+        <p>
+        <label for="preparation">Zubereitung</label><br/>
+        <textarea name="preparation" cols="80" rows="15"></textarea><br/>
+        </p>
+        <p>
+        <label for="number_people">Anzahl Personen</label>
+        <input type="text" name="number_people" id="number_people"/><br/>
+        </p>
+        <p><input type="submit" value="Speichern"></p>
+    </form>
+</div>
 </body>
 </html>

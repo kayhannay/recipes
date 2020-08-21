@@ -4,22 +4,41 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width" />
     <title>Rezepte - Login</title>
+    <style>
+        body {
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        #login {
+            border: 3px solid #0000A0;
+            background-color: #DCDCFF;
+            padding: 1em;
+        }
+    </style>
 </head>
 <body>
+{{> header }}
 <h1>Rezepte: Please Login</h1>
 
-<p>Please login to continue.</p>
-
+<div id="login">
 {{#if common.message}}
     <p>{{#if common.message_type}}{{common.message_type}}: {{/if}}{{ common.message }}</p>
 {{/if}}
 
 <form action="/login" method="post" accept-charset="utf-8">
-    <label for="username">username</label>
-    <input type="text" name="username" id="username" value="" />
-    <label for="password">password</label>
-    <input type="password" name="password" id="password" value="" />
-    <p><input type="submit" value="login"></p>
+    <table>
+        <tr>
+            <td><label for="username">Benutzername</label></td>
+            <td><input type="text" name="username" id="username" value="" /></td>
+        </tr>
+        <tr>
+            <td><label for="password">Passwort</label></td>
+            <td><input type="password" name="password" id="password" value="" /></td>
+        </tr>
+    </table>
+    <p><input type="submit" value="Anmelden"></p>
 </form>
+</div>
 </body>
 </html>
