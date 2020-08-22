@@ -31,7 +31,7 @@
             <label for="category">Kategorie</label>
             <select id="category" name="category">
                 {{#each categories}}
-                <option value="{{this.id}}">{{this.name}}</option>
+                <option value="{{this.id}}" {{selected this.id 1}}>{{this.name}}</option>
                 {{/each}}
             </select>
         </p>
