@@ -6,7 +6,7 @@ table! {
 }
 
 table! {
-    rezepte (id) {
+    recipes (id) {
         id -> Integer,
         name -> Varchar,
         ingredients -> Text,
@@ -22,17 +22,6 @@ table! {
 }
 
 table! {
-    sessions (sid) {
-        sid -> Varchar,
-        ip -> Nullable<Varchar>,
-        browser -> Nullable<Varchar>,
-        uid -> Integer,
-        login_time -> Timestamp,
-        expires -> Integer,
-    }
-}
-
-table! {
     user (uid) {
         uid -> Integer,
         password -> Varchar,
@@ -43,15 +32,4 @@ table! {
     }
 }
 
-table! {
-    users (uid) {
-        uid -> Integer,
-        passwd -> Varchar,
-        login -> Varchar,
-        name -> Nullable<Varchar>,
-        role -> Nullable<Integer>,
-        created -> Timestamp,
-    }
-}
-
-allow_tables_to_appear_in_same_query!(categories, rezepte, sessions, user, users,);
+allow_tables_to_appear_in_same_query!(categories, recipes, user,);

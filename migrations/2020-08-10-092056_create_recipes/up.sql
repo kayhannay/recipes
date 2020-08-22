@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS `rezepte` (
+CREATE TABLE IF NOT EXISTS `recipes` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(70) COLLATE utf8_unicode_ci NOT NULL,
   `ingredients` text COLLATE utf8_unicode_ci NOT NULL,

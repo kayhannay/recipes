@@ -30,12 +30,12 @@ impl Image for MySql {
 
     fn env_vars(&self) -> Self::EnvVars {
         let mut env_vars = Self::EnvVars::new();
-        env_vars.insert(String::from("MYSQL_USER"), String::from("rezepte"));
+        env_vars.insert(String::from("MYSQL_USER"), String::from("recipes"));
         env_vars.insert(
             String::from("MYSQL_PASSWORD"),
-            String::from("rezepte-secret"),
+            String::from("recipes-secret"),
         );
-        env_vars.insert(String::from("MYSQL_DATABASE"), String::from("rezepte"));
+        env_vars.insert(String::from("MYSQL_DATABASE"), String::from("recipes"));
         env_vars.insert(
             String::from("MYSQL_RANDOM_ROOT_PASSWORD"),
             String::from("yes"),
@@ -59,7 +59,7 @@ pub fn setup() -> (Client, recipes::repository::common::RecipeDatabase) {
     let mysql_port = container.get_host_port(3306).unwrap();
     println!("Test database port: {}", mysql_port);
     let mysql_url = format!(
-        "{{recipe_db={{url=\"mysql://rezepte:rezepte-secret@127.0.0.1:{}/rezepte\"}}}}",
+        "{{recipe_db={{url=\"mysql://recipes:recipes-secret@127.0.0.1:{}/recipes\"}}}}",
         mysql_port
     );
 

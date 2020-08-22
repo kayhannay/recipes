@@ -3,7 +3,7 @@ extern crate chrono;
 
 use self::bigdecimal::BigDecimal;
 use self::chrono::NaiveDateTime;
-use repository::schema::rezepte;
+use repository::schema::recipes;
 
 #[derive(Debug, Queryable, Serialize, Deserialize, Clone)]
 pub struct Recipe {
@@ -20,7 +20,7 @@ pub struct Recipe {
 }
 
 #[derive(Debug, Queryable, Insertable, Serialize, Deserialize, Clone)]
-#[table_name = "rezepte"]
+#[table_name = "recipes"]
 pub struct NewRecipe {
     pub name: String,
     pub ingredients: String,
