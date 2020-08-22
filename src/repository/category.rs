@@ -6,10 +6,12 @@ use repository::schema::categories;
 use repository::schema::categories::all_columns;
 
 pub fn get_categories(connection: &RecipeDatabase) -> Vec<Category> {
-    categories::table
+    let mut categories: Vec<Category> = categories::table
         .select(all_columns)
         .load::<Category>(&**connection)
-        .unwrap()
+        .unwrap();
+    categories.sort_by(|a, b| a.name.cmp(&b.name));
+    categories
 }
 
 pub fn save_category(category: &NewCategory, connection: &RecipeDatabase) -> Result<usize, Error> {

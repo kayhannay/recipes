@@ -1,6 +1,8 @@
 use repository::schema::categories;
 
-#[derive(Debug, Queryable, Insertable, Serialize, Deserialize, Clone)]
+#[derive(
+    Debug, Queryable, Insertable, Serialize, Deserialize, Clone, Eq, Ord, PartialEq, PartialOrd,
+)]
 #[table_name = "categories"]
 pub struct Category {
     pub id: i32,

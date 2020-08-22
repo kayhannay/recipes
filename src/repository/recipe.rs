@@ -6,19 +6,21 @@ use repository::schema::categories;
 use repository::schema::rezepte;
 
 pub fn get_recipes(connection: &RecipeDatabase) -> Vec<RecipeName> {
-    let recipe_list: Vec<RecipeName> = rezepte::table
+    let mut recipe_list: Vec<RecipeName> = rezepte::table
         .select((rezepte::id, rezepte::name, rezepte::category))
         .load::<RecipeName>(&**connection)
         .unwrap();
+    recipe_list.sort_by(|a, b| a.name.cmp(&b.name));
     recipe_list
 }
 
 pub fn get_recipes_by_category(category: i32, connection: &RecipeDatabase) -> Vec<RecipeName> {
-    let recipe_list: Vec<RecipeName> = rezepte::table
+    let mut recipe_list: Vec<RecipeName> = rezepte::table
         .select((rezepte::id, rezepte::name, rezepte::category))
         .filter(repository::schema::rezepte::category.eq(category))
         .load::<RecipeName>(&**connection)
         .unwrap();
+    recipe_list.sort_by(|a, b| a.name.cmp(&b.name));
     recipe_list
 }
 
