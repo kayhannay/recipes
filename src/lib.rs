@@ -89,7 +89,8 @@ pub fn init_application() -> rocket::Rocket {
                 controller::config::config,
                 controller::config::user_config,
                 controller::login::logout,
-                controller::user::create_user
+                controller::user::create_user,
+                controller::category::create_category
             ],
         )
         .attach(Template::custom(|engines| {

@@ -16,7 +16,11 @@ pub fn get_user(username: &str, connection: &RecipeDatabase) -> Option<RecipeUse
 }
 
 pub fn save_user(user: &NewRecipeUser, connection: &RecipeDatabase) -> Result<usize, Error> {
-    diesel::insert_into(user::table)
-        .values(user)
-        .execute(&**connection)
+    if get_user(&user.username, connection).is_some() {
+        Err(Error::NotFound)
+    } else {
+        diesel::insert_into(user::table)
+            .values(user)
+            .execute(&**connection)
+    }
 }

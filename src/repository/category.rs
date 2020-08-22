@@ -14,8 +14,23 @@ pub fn get_categories(connection: &RecipeDatabase) -> Vec<Category> {
     categories
 }
 
+fn get_category(category_name: &str, connection: &RecipeDatabase) -> Option<Category> {
+    let category = categories::table
+        .select(all_columns)
+        .filter(categories::name.eq(category_name))
+        .load::<Category>(&**connection)
+        .unwrap()
+        .first()?
+        .clone();
+    Some(category)
+}
+
 pub fn save_category(category: &NewCategory, connection: &RecipeDatabase) -> Result<usize, Error> {
-    diesel::insert_into(categories::table)
-        .values(category)
-        .execute(&**connection)
+    if get_category(&category.name, connection).is_some() {
+        Err(Error::NotFound)
+    } else {
+        diesel::insert_into(categories::table)
+            .values(category)
+            .execute(&**connection)
+    }
 }

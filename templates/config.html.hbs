@@ -42,6 +42,13 @@
         <p><input type="submit" value="Erstellen"></p>
     </form>
 
+    <h2>Kategorie hinzufügen</h2>
+    <form action="/category" method="post" accept-charset="utf-8">
+        <p><label for="name">Name</label>
+        <input type="text" name="name" id="name" value="" /></p>
+        <p><input type="submit" value="Erstellen"></p>
+    </form>
+
     {{#if common.message}}
         <p>{{#if common.message_type}}{{common.message_type}}: {{/if}}{{ common.message }}</p>
     {{/if}}
