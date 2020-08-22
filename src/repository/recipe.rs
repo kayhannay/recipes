@@ -13,6 +13,15 @@ pub fn get_recipes(connection: &RecipeDatabase) -> Vec<RecipeName> {
     recipe_list
 }
 
+pub fn get_recipes_by_category(category: i32, connection: &RecipeDatabase) -> Vec<RecipeName> {
+    let recipe_list: Vec<RecipeName> = rezepte::table
+        .select((rezepte::id, rezepte::name, rezepte::category))
+        .filter(repository::schema::rezepte::category.eq(category))
+        .load::<RecipeName>(&**connection)
+        .unwrap();
+    recipe_list
+}
+
 joinable!(rezepte -> categories (category));
 
 pub fn get_recipe(id: i32, connection: &RecipeDatabase) -> Option<Recipe> {

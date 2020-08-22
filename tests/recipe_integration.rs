@@ -10,21 +10,34 @@ use bigdecimal::BigDecimal;
 use recipes::domain::category::NewCategory;
 use recipes::repository::common::RecipeDatabase;
 use rocket::http::{ContentType, Status};
+use std::collections::HashMap;
 
 const TEST_CATEGORY: &str = "Testcategory";
 
 fn create_test_recipe(database_connection: &RecipeDatabase) -> recipes::domain::recipe::NewRecipe {
+    create_test_recipe_by_category(TEST_CATEGORY, "Test Recipe", database_connection)
+}
+
+fn create_test_recipe_by_category(
+    category: &str,
+    recipe_name: &str,
+    database_connection: &RecipeDatabase,
+) -> recipes::domain::recipe::NewRecipe {
     recipes::repository::category::save_category(
         &NewCategory {
-            name: String::from(TEST_CATEGORY),
+            name: String::from(category),
         },
         &database_connection,
     )
     .ok();
     let categories = recipes::repository::category::get_categories(&database_connection);
-    let category = categories.get(0).unwrap();
+    let mut category_map = HashMap::new();
+    for c in categories {
+        category_map.insert(c.name.clone(), c.id);
+    }
+    let category_id = category_map.get(category).unwrap();
     recipes::domain::recipe::NewRecipe {
-        name: "Test Recipe".to_string(),
+        name: recipe_name.to_string(),
         ingredients: "Some sugar".to_string(),
         preparation: "Boil it.".to_string(),
         experience: None,
@@ -32,8 +45,21 @@ fn create_test_recipe(database_connection: &RecipeDatabase) -> recipes::domain::
         number_people: Some(BigDecimal::from(4)),
         owner: None,
         rights: None,
-        category: Some(category.id),
+        category: Some(*category_id),
     }
+}
+
+#[test]
+fn should_forward_to_recipelist_from_index() {
+    // Given
+    let (client, _) = common::setup();
+
+    // When
+    let response = client.get("/").dispatch();
+
+    // Then
+    assert_eq!(response.status(), Status::SeeOther);
+    assert_eq!(response.headers().get_one("Location"), Some("/recipelist"));
 }
 
 #[test]
@@ -42,7 +68,7 @@ fn should_render_empty_recipe_list() {
     let (client, _database_connection) = common::setup();
 
     // When
-    let mut response = client.get("/").dispatch();
+    let mut response = client.get("/recipelist").dispatch();
 
     // Then
     assert_eq!(response.status(), Status::Ok);
@@ -62,7 +88,7 @@ fn should_render_recipe_list() {
     let recipe_id = recipes.get(0).unwrap().id;
 
     // When
-    let mut response = client.get("/").dispatch();
+    let mut response = client.get("/recipelist").dispatch();
 
     // Then
     assert_eq!(response.status(), Status::Ok);
@@ -70,6 +96,30 @@ fn should_render_recipe_list() {
         "<li class=\"recipe\"><a href=\"/recipe/{}\">{}</a></li>",
         recipe_id, recipe.name
     )));
+}
+
+#[test]
+fn should_render_recipe_list_by_category() {
+    // Given
+    let (client, database_connection) = common::setup();
+    let recipe_cat1 =
+        create_test_recipe_by_category("Category1", "Recipe Category 1", &database_connection);
+    let recipe_cat2 =
+        create_test_recipe_by_category("Category2", "Recipe Category 2", &database_connection);
+    recipes::repository::recipe::save_recipe(&recipe_cat1, &database_connection).ok();
+    recipes::repository::recipe::save_recipe(&recipe_cat2, &database_connection).ok();
+
+    // When
+    let mut response = client
+        .get(format!("/recipelist/{}", recipe_cat2.category.unwrap()))
+        .dispatch();
+
+    // Then
+    assert_eq!(response.status(), Status::Ok);
+    let body = response.body_string().unwrap();
+    println!("Body is: {}", &body);
+    assert!(body.contains(&format!("\">{}</a></li>", recipe_cat2.name)));
+    assert!(!body.contains(&format!("\">{}</a></li>", recipe_cat1.name)));
 }
 
 #[test]
@@ -178,7 +228,7 @@ fn should_create_recipe() {
 
     // Then
     assert_eq!(response.status(), Status::SeeOther);
-    assert_eq!(response.headers().get_one("Location"), Some("/"));
+    assert_eq!(response.headers().get_one("Location"), Some("/recipelist"));
     let recipes = recipes::repository::recipe::get_recipes(&database_connection);
     assert_eq!(recipes.len(), 1);
     println!("Recipes: {:?}", recipes);

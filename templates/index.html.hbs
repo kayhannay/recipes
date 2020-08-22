@@ -21,6 +21,13 @@
         <h1>Rezeptdatenbank</h1>
 
         <div id="recipe-overview">
+            Kategorie
+            <select id="categories" name="categories" onchange="javascript:location.href = '/recipelist/' + this.value;">
+                <option value="">Alle</option>
+                {{#each categories}}
+                    <option value="{{this.id}}" {{selected this.id ../current_category}}>{{this.name}}</option>
+                {{/each}}
+            </select>
             <ul id="recipe-list">
                 {{#each recipe_names}}
                     <li class="recipe"><a href="/recipe/{{this.id}}">{{this.name}}</a></li>

@@ -24,8 +24,36 @@ pub mod repository;
 use chrono::Local;
 use env_logger::Builder;
 use log::LevelFilter;
+use rocket_contrib::templates::handlebars;
+use rocket_contrib::templates::handlebars::RenderError;
 use rocket_contrib::templates::Template;
 use std::io::Write;
+
+fn selected_helper(
+    h: &handlebars::Helper<'_, '_>,
+    _: &handlebars::Handlebars,
+    _: &handlebars::Context,
+    _: &mut handlebars::RenderContext<'_>,
+    out: &mut dyn handlebars::Output,
+) -> handlebars::HelperResult {
+    // just for example, add error check for unwrap
+    let left_value = h
+        .param(0)
+        .ok_or_else(|| RenderError::new("param 0 not found"))
+        .map(|v| v.value())
+        .unwrap();
+    let right_value = h
+        .param(1)
+        .ok_or_else(|| RenderError::new("param 1 not found"))
+        .map(|v| v.value())
+        .unwrap();
+    if left_value == right_value {
+        out.write("selected")?;
+    } else {
+        out.write("")?;
+    }
+    Ok(())
+}
 
 pub fn init_logging() {
     Builder::new()
@@ -48,7 +76,9 @@ pub fn init_application() -> rocket::Rocket {
         .mount(
             "/",
             routes![
+                controller::recipe::index,
                 controller::recipe::recipe_list,
+                controller::recipe::recipe_list_by_category,
                 controller::recipe::recipe,
                 controller::recipe::new_recipe,
                 controller::recipe::create_recipe,
@@ -62,7 +92,12 @@ pub fn init_application() -> rocket::Rocket {
                 controller::user::create_user
             ],
         )
-        .attach(Template::fairing())
+        .attach(Template::custom(|engines| {
+            engines
+                .handlebars
+                .register_helper("selected", Box::new(selected_helper));
+        }))
+        //.attach(Template::fairing())
         .attach(repository::common::RecipeDatabase::fairing());
     repository::common::run_migrations(
         &*repository::common::RecipeDatabase::get_one(&rocket).unwrap(),

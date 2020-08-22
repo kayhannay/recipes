@@ -39,7 +39,7 @@ fn should_login_by_cookie() {
 
     // Then
     assert_eq!(response.status(), Status::SeeOther);
-    assert_eq!(response.headers().get_one("Location"), Some("/"));
+    assert_eq!(response.headers().get_one("Location"), Some("/recipelist"));
 }
 
 #[test]
@@ -63,7 +63,7 @@ fn should_login() {
 
     // Then
     assert_eq!(response.status(), Status::SeeOther);
-    assert_eq!(response.headers().get_one("Location"), Some("/"));
+    assert_eq!(response.headers().get_one("Location"), Some("/recipelist"));
 }
 
 #[test]

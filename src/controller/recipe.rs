@@ -22,11 +22,41 @@ pub struct CreateRecipe {
 }
 
 #[get("/")]
+pub fn index() -> Redirect {
+    Redirect::to(uri!(recipe_list))
+}
+
+#[get("/recipelist")]
 pub fn recipe_list(connection: RecipeDatabase, cookies: Cookies) -> Template {
     let recipe_list = repository::recipe::get_recipes(&connection);
+    let categories = repository::category::get_categories(&connection);
     let current_user = controller::common::get_current_user(cookies);
     let recipe_list_model = RecipeOverviewModel {
         recipe_names: recipe_list,
+        categories,
+        current_category: 0,
+        common: CommonContext {
+            current_user,
+            message: None,
+            message_type: MessageType::None,
+        },
+    };
+    Template::render("index", &recipe_list_model)
+}
+
+#[get("/recipelist/<category>")]
+pub fn recipe_list_by_category(
+    category: i32,
+    connection: RecipeDatabase,
+    cookies: Cookies,
+) -> Template {
+    let recipe_list = repository::recipe::get_recipes_by_category(category, &connection);
+    let categories = repository::category::get_categories(&connection);
+    let current_user = controller::common::get_current_user(cookies);
+    let recipe_list_model = RecipeOverviewModel {
+        recipe_names: recipe_list,
+        categories,
+        current_category: category,
         common: CommonContext {
             current_user,
             message: None,
@@ -98,6 +128,8 @@ pub fn new_recipe() -> Redirect {
 #[derive(Serialize)]
 struct RecipeOverviewModel {
     recipe_names: Vec<RecipeName>,
+    categories: Vec<Category>,
+    current_category: i32,
     common: CommonContext,
 }
 
