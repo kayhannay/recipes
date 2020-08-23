@@ -28,15 +28,11 @@ fn get_category(category_name: &str, connection: &RecipeDatabase) -> Option<Cate
 
 pub fn save_category(category: &NewCategory, connection: &RecipeDatabase) -> Result<usize, Error> {
     if get_category(&category.name, connection).is_some() {
-        log::info!("Catrgory exists!");
         Err(Error::NotFound)
     } else {
-        log::info!("Create category ...");
-        let result = diesel::insert_into(categories::table)
+        diesel::insert_into(categories::table)
             .values(category)
-            .execute(&**connection);
-        log::info!("Result of create category: {:?}", result);
-        result
+            .execute(&**connection)
     }
 }
 

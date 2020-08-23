@@ -41,7 +41,7 @@ pub fn recipe_list(connection: RecipeDatabase, cookies: Cookies) -> Template {
             message_type: MessageType::None,
         },
     };
-    Template::render("index", &recipe_list_model)
+    Template::render("recipe_list", &recipe_list_model)
 }
 
 #[get("/recipelist/<category>")]
@@ -63,7 +63,7 @@ pub fn recipe_list_by_category(
             message_type: MessageType::None,
         },
     };
-    Template::render("index", &recipe_list_model)
+    Template::render("recipe_list", &recipe_list_model)
 }
 
 #[get("/recipe/<id>")]

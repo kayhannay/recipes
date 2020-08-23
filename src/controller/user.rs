@@ -57,14 +57,14 @@ pub fn delete_user(
 ) -> Result<Flash<Redirect>, Flash<Redirect>> {
     let result = repository::user::delete_user(id, &connection);
     match result {
-        Ok(_) => {
+        Ok(1) => {
             log::info!("Deleted user {}", id);
             Ok(Flash::success(
                 Redirect::to(uri!(controller::config::user_config)),
                 "User deleted",
             ))
         }
-        Err(_) => Err(Flash::error(
+        _ => Err(Flash::error(
             Redirect::to(uri!(controller::config::user_config)),
             "Could not delete user!",
         )),

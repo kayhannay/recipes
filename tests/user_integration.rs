@@ -214,3 +214,49 @@ fn should_not_create_user_exists() {
     let result = recipes::repository::user::get_user(&user.username, &database_connection);
     assert!(result.is_some());
 }
+
+#[test]
+fn should_delete_user() {
+    // Given
+    let (client, database_connection) = common::setup();
+    let user = recipes::domain::user::NewRecipeUser {
+        name: Some("Foo".to_string()),
+        username: "foo".to_string(),
+        password: "secret".to_string(),
+    };
+    recipes::repository::user::save_user(&user, &database_connection).ok();
+    let user_id = recipes::repository::user::get_user(&user.username, &database_connection)
+        .unwrap()
+        .uid;
+
+    // When
+    let response = client.get(format!("/deleteuser/{}", user_id)).dispatch();
+
+    // Then
+    assert_eq!(response.status(), Status::SeeOther);
+    assert_eq!(response.headers().get_one("Location"), Some("/config"));
+    let flash_cookie = common::get_cookie(&response, "_flash");
+    assert_eq!(flash_cookie.unwrap().value(), "7:successUser deleted");
+    let result = recipes::repository::user::get_all_user(&database_connection);
+    assert_eq!(result.len(), 0);
+}
+
+#[test]
+fn should_not_delete_category() {
+    // Given
+    let (client, database_connection) = common::setup();
+
+    // When
+    let response = client.get(format!("/deleteuser/{}", 123)).dispatch();
+
+    // Then
+    assert_eq!(response.status(), Status::SeeOther);
+    assert_eq!(response.headers().get_one("Location"), Some("/config"));
+    let flash_cookie = common::get_cookie(&response, "_flash");
+    assert_eq!(
+        flash_cookie.unwrap().value(),
+        "5:errorCould not delete user!"
+    );
+    let result = recipes::repository::user::get_all_user(&database_connection);
+    assert_eq!(result.len(), 0);
+}
