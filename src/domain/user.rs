@@ -1,6 +1,8 @@
 use repository::schema::user;
 
-#[derive(Debug, Queryable, Insertable, Serialize, Deserialize, Clone)]
+#[derive(
+    Debug, Queryable, Insertable, Serialize, Deserialize, Clone, Eq, Ord, PartialEq, PartialOrd,
+)]
 #[table_name = "user"]
 pub struct RecipeUser {
     pub uid: i32,

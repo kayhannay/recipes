@@ -8,6 +8,7 @@ use rocket::request::{FlashMessage, Form, FromRequest};
 use rocket::response::{Flash, Redirect};
 use rocket::{request, Request};
 use rocket_contrib::templates::Template;
+use std::collections::HashMap;
 
 #[derive(FromForm)]
 pub struct Login {
@@ -30,10 +31,12 @@ pub fn login_user(_user: User) -> Redirect {
 
 #[get("/login", rank = 2)]
 pub fn login_page(flash: Option<FlashMessage>) -> Template {
-    Template::render(
-        "login",
-        &controller::common::create_common_context(flash, None),
-    )
+    let mut context = HashMap::new();
+    context.insert(
+        "common",
+        controller::common::create_common_context(flash, None),
+    );
+    Template::render("login", &context)
 }
 
 #[post("/login", data = "<login>")]

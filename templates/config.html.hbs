@@ -10,10 +10,11 @@
             margin-left: auto;
             margin-right: auto;
         }
-        #configuration {
+        .configuration {
             border: 3px solid #0000A0;
             background-color: #DCDCFF;
             padding: 1em;
+            margin-bottom: 1em;
         }
     </style>
 </head>
@@ -22,8 +23,21 @@
 
 <h1>Rezepte: Konfiguration</h1>
 
-<div id="configuration">
-    <h2>Benutzer hinzufügen</h2>
+<div class="configuration">
+    <h2>Benutzer</h2>
+    <table>
+        <tr>
+            <th>Name</th><th>Benutzername</th>
+        </tr>
+        {{#each user}}
+        <tr>
+            <td>{{this.name}}</td><td>{{this.username}}</td>
+            <td><a href="#" onclick="if (confirm('Benutzer wirklich löschen?')) { window.location='/deleteuser/{{this.uid}}';}">Löschen</a></td>
+        </tr>
+        {{/each}}
+    </table>
+    <hr/>
+    <h3>Benutzer hinzufügen</h3>
     <form action="/user" method="post" accept-charset="utf-8">
         <table>
             <tr>
@@ -41,8 +55,22 @@
         </table>
         <p><input type="submit" value="Erstellen"></p>
     </form>
-
-    <h2>Kategorie hinzufügen</h2>
+</div>
+<div class="configuration">
+    <h2>Kategorien</h2>
+    <table>
+        <tr>
+            <th>Name</th>
+        </tr>
+        {{#each categories}}
+            <tr>
+                <td>{{this.name}}</td>
+                <td><a href="#" onclick="if (confirm('Kategorie wirklich löschen?')) { window.location='/deletecategory/{{this.id}}';}">Löschen</a></td>
+            </tr>
+        {{/each}}
+    </table>
+    <hr/>
+    <h3>Kategorie hinzufügen</h3>
     <form action="/category" method="post" accept-charset="utf-8">
         <p><label for="name">Name</label>
         <input type="text" name="name" id="name" value="" /></p>

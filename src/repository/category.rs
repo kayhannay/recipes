@@ -1,6 +1,7 @@
 use diesel::prelude::*;
 use diesel::result::Error;
 use domain::category::{Category, NewCategory};
+use repository;
 use repository::common::RecipeDatabase;
 use repository::schema::categories;
 use repository::schema::categories::all_columns;
@@ -27,10 +28,21 @@ fn get_category(category_name: &str, connection: &RecipeDatabase) -> Option<Cate
 
 pub fn save_category(category: &NewCategory, connection: &RecipeDatabase) -> Result<usize, Error> {
     if get_category(&category.name, connection).is_some() {
+        log::info!("Catrgory exists!");
         Err(Error::NotFound)
     } else {
-        diesel::insert_into(categories::table)
+        log::info!("Create category ...");
+        let result = diesel::insert_into(categories::table)
             .values(category)
-            .execute(&**connection)
+            .execute(&**connection);
+        log::info!("Result of create category: {:?}", result);
+        result
     }
+}
+
+pub fn delete_category(category_id: i32, connection: &RecipeDatabase) -> Result<usize, Error> {
+    diesel::delete(
+        repository::schema::categories::dsl::categories.filter(categories::id.eq(category_id)),
+    )
+    .execute(&**connection)
 }

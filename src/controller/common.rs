@@ -2,7 +2,6 @@ use crypto::digest::Digest;
 use crypto::sha2::Sha512;
 use rocket::http::Cookies;
 use rocket::request::FlashMessage;
-use std::collections::HashMap;
 
 pub const COOKIE_NAME: &str = "user";
 
@@ -40,11 +39,7 @@ pub fn create_hash(input: &str) -> String {
     hasher.result_str()
 }
 
-pub fn create_common_context<'a>(
-    flash: Option<FlashMessage>,
-    user: Option<User>,
-) -> HashMap<&'a str, CommonContext> {
-    let mut context = HashMap::new();
+pub fn create_common_context(flash: Option<FlashMessage>, user: Option<User>) -> CommonContext {
     let mut common = CommonContext {
         current_user: user,
         message: None,
@@ -59,8 +54,7 @@ pub fn create_common_context<'a>(
         common.message = Some(msg.msg().to_string());
         common.message_type = message_type;
     }
-    context.insert("common", common);
-    context
+    common
 }
 
 #[cfg(test)]
@@ -74,12 +68,9 @@ mod test {
         let result = create_common_context(None, None);
 
         // Then
-        assert_eq!(result.len(), 1);
-        assert!(result.contains_key("common"));
-        let common_context = result.get("common").unwrap();
-        assert!(common_context.current_user.is_none());
-        assert!(common_context.message.is_none());
-        assert_eq!(common_context.message_type, MessageType::None);
+        assert!(result.current_user.is_none());
+        assert!(result.message.is_none());
+        assert_eq!(result.message_type, MessageType::None);
     }
 
     #[test]
@@ -94,11 +85,8 @@ mod test {
         let result = create_common_context(None, Some(user.clone()));
 
         // Then
-        assert_eq!(result.len(), 1);
-        assert!(result.contains_key("common"));
-        let common_context = result.get("common").unwrap();
-        assert_eq!(common_context.current_user, Some(user));
-        assert!(common_context.message.is_none());
-        assert_eq!(common_context.message_type, MessageType::None);
+        assert_eq!(result.current_user, Some(user));
+        assert!(result.message.is_none());
+        assert_eq!(result.message_type, MessageType::None);
     }
 }

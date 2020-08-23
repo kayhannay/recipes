@@ -36,3 +36,24 @@ pub fn create_category(
         )),
     }
 }
+
+#[get("/deletecategory/<id>")]
+pub fn delete_category(
+    id: i32,
+    connection: RecipeDatabase,
+) -> Result<Flash<Redirect>, Flash<Redirect>> {
+    let result = repository::category::delete_category(id, &connection);
+    match result {
+        Ok(_) => {
+            log::info!("Deleted category {}", id);
+            Ok(Flash::success(
+                Redirect::to(uri!(controller::config::user_config)),
+                "Category deleted",
+            ))
+        }
+        Err(_) => Err(Flash::error(
+            Redirect::to(uri!(controller::config::user_config)),
+            "Could not delete category!",
+        )),
+    }
+}
