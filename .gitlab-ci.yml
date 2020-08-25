@@ -5,6 +5,7 @@ stages:
   - lint
   - build
   - test
+  - release
 
 init:
   stage: init
@@ -26,3 +27,11 @@ test:
   stage: test
   script:
     - cargo test
+
+release:
+  stage: release
+  script:
+    - cargo build --release
+  artifacts:
+    paths:
+      - target/release/recipes
