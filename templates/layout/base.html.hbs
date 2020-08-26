@@ -1,0 +1,29 @@
+<!doctype html>
+<html>
+<head>
+    <title>
+        {{#if title}}
+            {{title}}
+        {{else}}
+            Base Page Title
+        {{/if}}
+    </title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <style>
+        body {
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+    </style>
+    {{#> head-block}}
+    {{/head-block}}
+</head>
+<body>
+
+{{#> content-block}}
+{{/content-block}}
+
+</body>
+</html>

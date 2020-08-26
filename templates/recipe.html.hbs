@@ -1,23 +1,16 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width" />
-        <title>Rezept</title>
+{{#> layout/base title="Rezepte - Details" }}
+
+    {{#*inline "head-block"}}
         <style>
-            body {
-                max-width: 700px;
-                margin-left: auto;
-                margin-right: auto;
-            }
             #recipe-details {
                 border: 3px solid #0000A0;
                 background-color: #DCDCFF;
                 padding: 1em;
             }
         </style>
-    </head>
-    <body>
+    {{/inline}}
+
+    {{#*inline "content-block"}}
         {{> header }}
         <h1>Rezept</h1>
         <div id="recipe-details">
@@ -30,5 +23,6 @@
             <p id="recipe-people"><b>Anzahl Personen:</b> {{recipe.number_people}}</p>
             <p id="recipe-created"><b>vom:</b> {{recipe.created}}</p>
         </div>
-    </body>
-</html>
+    {{/inline}}
+
+{{/layout/base}}
