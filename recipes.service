@@ -1,0 +1,12 @@
+[Unit]
+Description=Recipes database
+
+[Service]
+User=1000
+ExecStart=/opt/recipes/recipes
+WorkingDirectory=/opt/recipes
+Restart=on-failure
+RestartSec=30
+
+[Install]
+WantedBy=multi-user.target

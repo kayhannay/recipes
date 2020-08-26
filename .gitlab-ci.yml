@@ -32,6 +32,9 @@ release:
   stage: release
   script:
     - cargo build --release
+    - cp target/release/recipes .
   artifacts:
     paths:
-      - target/release/recipes
+      - recipes
+      - templates
+      - recipes.service
