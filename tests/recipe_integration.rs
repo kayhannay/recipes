@@ -191,7 +191,7 @@ fn should_render_new_recipe_form() {
     assert!(response
         .body_string()
         .unwrap()
-        .contains("<title>Rezept - Neu</title>"));
+        .contains("<title>Rezepte - Neu</title>"));
 }
 
 #[test]
