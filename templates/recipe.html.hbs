@@ -23,6 +23,10 @@
             <p id="recipe-people"><b>Anzahl Personen:</b> {{recipe.number_people}}</p>
             <p id="recipe-created"><b>vom:</b> {{recipe.created}}</p>
         </div>
+        {{#if common.current_user}}
+            <a href="/recipe/update/{{recipe.id}}">Bearbeiten</a>
+            <a href="#" onclick="if (confirm('Rezept wirklich löschen?')) { window.location='/recipe/delete/{{recipe.id}}';}">Löschen</a>
+        {{/if}}
     {{/inline}}
 
 {{/layout/base}}

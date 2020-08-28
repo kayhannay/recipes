@@ -207,7 +207,7 @@ fn should_create_recipe() {
     recipes::repository::user::save_user(&user, &database_connection).ok();
     let login_cookie = common::login(&client, &user.username, password).expect("logged in");
     let db_user =
-        recipes::repository::user::get_user(&user.username, &database_connection).unwrap();
+        recipes::repository::user::get_user_by_name(&user.username, &database_connection).unwrap();
     let test_recipe = create_test_recipe(&database_connection);
     let number_people = test_recipe.number_people.unwrap();
 
@@ -240,5 +240,5 @@ fn should_create_recipe() {
     assert_eq!(result_recipe.preparation, test_recipe.preparation);
     assert_eq!(result_recipe.category, TEST_CATEGORY);
     assert_eq!(result_recipe.number_people, Some(number_people));
-    assert_eq!(result_recipe.owner, Some(BigDecimal::from(db_user.uid)));
+    assert_eq!(result_recipe.owner, Some(BigDecimal::from(db_user.id)));
 }

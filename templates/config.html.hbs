@@ -24,7 +24,8 @@
                 {{#each user}}
                     <tr>
                         <td>{{this.name}}</td><td>{{this.username}}</td>
-                        <td><a href="#" onclick="if (confirm('Benutzer wirklich löschen?')) { window.location='/deleteuser/{{this.uid}}';}">Löschen</a></td>
+                        <td><a href="/update-user/{{this.id}}">Bearbeiten</a></td>
+                        <td><a href="#" onclick="if (confirm('Benutzer wirklich löschen?')) { window.location='/deleteuser/{{this.id}}';}">Löschen</a></td>
                     </tr>
                 {{/each}}
             </table>
@@ -57,6 +58,7 @@
                 {{#each categories}}
                     <tr>
                         <td>{{this.name}}</td>
+                        <td><a href="/update-category/{{this.id}}">Bearbeiten</a></td>
                         <td><a href="#" onclick="if (confirm('Kategorie wirklich löschen?')) { window.location='/deletecategory/{{this.id}}';}">Löschen</a></td>
                     </tr>
                 {{/each}}

@@ -33,7 +33,7 @@ fn should_create_user() {
     // Then
     assert_eq!(response.status(), Status::SeeOther);
     assert_eq!(response.headers().get_one("Location"), Some("/config"));
-    let result = recipes::repository::user::get_user(&user.username, &database_connection);
+    let result = recipes::repository::user::get_user_by_name(&user.username, &database_connection);
     assert!(result.is_some());
     let result_user = result.unwrap();
     assert_eq!(result_user.username, user.username);
@@ -74,7 +74,7 @@ fn should_not_create_user_no_username() {
         flash_cookie.unwrap().value(),
         "5:errorCould not create user!"
     );
-    let result = recipes::repository::user::get_user(&user.username, &database_connection);
+    let result = recipes::repository::user::get_user_by_name(&user.username, &database_connection);
     assert!(result.is_none());
 }
 
@@ -108,7 +108,7 @@ fn should_not_create_user_no_password() {
         flash_cookie.unwrap().value(),
         "5:errorCould not create user!"
     );
-    let result = recipes::repository::user::get_user(&user.username, &database_connection);
+    let result = recipes::repository::user::get_user_by_name(&user.username, &database_connection);
     assert!(result.is_none());
 }
 
@@ -135,7 +135,7 @@ fn should_create_user_no_name() {
     // Then
     assert_eq!(response.status(), Status::SeeOther);
     assert_eq!(response.headers().get_one("Location"), Some("/config"));
-    let result = recipes::repository::user::get_user(&user.username, &database_connection);
+    let result = recipes::repository::user::get_user_by_name(&user.username, &database_connection);
     assert!(result.is_some());
     let result_user = result.unwrap();
     assert_eq!(result_user.username, user.username);
@@ -176,7 +176,7 @@ fn should_not_create_user_long_username() {
         flash_cookie.unwrap().value(),
         "5:errorCould not create user!"
     );
-    let result = recipes::repository::user::get_user(&user.username, &database_connection);
+    let result = recipes::repository::user::get_user_by_name(&user.username, &database_connection);
     assert!(result.is_none());
 }
 
@@ -211,7 +211,7 @@ fn should_not_create_user_exists() {
         flash_cookie.unwrap().value(),
         "5:errorCould not create user!"
     );
-    let result = recipes::repository::user::get_user(&user.username, &database_connection);
+    let result = recipes::repository::user::get_user_by_name(&user.username, &database_connection);
     assert!(result.is_some());
 }
 
@@ -225,9 +225,9 @@ fn should_delete_user() {
         password: "secret".to_string(),
     };
     recipes::repository::user::save_user(&user, &database_connection).ok();
-    let user_id = recipes::repository::user::get_user(&user.username, &database_connection)
+    let user_id = recipes::repository::user::get_user_by_name(&user.username, &database_connection)
         .unwrap()
-        .uid;
+        .id;
 
     // When
     let response = client.get(format!("/deleteuser/{}", user_id)).dispatch();

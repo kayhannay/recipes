@@ -1,14 +1,24 @@
 extern crate crypto;
 
 use controller;
-use domain::user::NewRecipeUser;
+use controller::common::{create_common_context, CommonContext, User};
+use domain::user::{NewRecipeUser, RecipeUser, UpdateRecipeUser};
 use repository;
 use repository::common::RecipeDatabase;
-use rocket::request::Form;
+use rocket::request::{FlashMessage, Form};
 use rocket::response::{Flash, Redirect};
+use rocket_contrib::templates::Template;
 
 #[derive(FromForm)]
 pub struct CreateUser {
+    username: String,
+    password: String,
+    name: String,
+}
+
+#[derive(FromForm)]
+pub struct UpdateUser {
+    id: i32,
     username: String,
     password: String,
     name: String,
@@ -47,6 +57,59 @@ pub fn create_user(
             ))
         }
         Err(_) => error,
+    }
+}
+
+#[derive(Serialize)]
+struct UserModel {
+    user: RecipeUser,
+    common: CommonContext,
+}
+
+#[get("/update-user/<id>")]
+pub fn update_user_form(
+    id: i32,
+    user: User,
+    flash: Option<FlashMessage>,
+    connection: RecipeDatabase,
+) -> Option<Template> {
+    let mut user_result = repository::user::get_user(id, &connection)?;
+    user_result.password = "".to_string();
+    let context = UserModel {
+        user: user_result,
+        common: create_common_context(flash, Some(user)),
+    };
+    Some(Template::render("update_user", &context))
+}
+
+#[post("/update-user", data = "<update_user>")]
+pub fn update_user(
+    _user: User,
+    connection: RecipeDatabase,
+    update_user: Form<UpdateUser>,
+) -> Result<Flash<Redirect>, Flash<Redirect>> {
+    let user = update_user.0;
+    let result = repository::user::update_user(
+        &UpdateRecipeUser {
+            id: user.id,
+            username: Some(user.username).filter(|x| !x.is_empty()),
+            password: Some(user.password).filter(|x| !x.is_empty()),
+            name: Some(user.name.clone()).filter(|x| !x.is_empty()),
+        },
+        &connection,
+    );
+    match result {
+        Ok(_) => {
+            log::info!("Updated user {}", &user.name);
+            Ok(Flash::success(
+                Redirect::to(uri!(controller::config::user_config)),
+                "User updated",
+            ))
+        }
+        Err(_) => Err(Flash::error(
+            Redirect::to(uri!(controller::config::user_config)),
+            "Could not update user!",
+        )),
     }
 }
 

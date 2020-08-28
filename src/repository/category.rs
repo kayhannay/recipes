@@ -15,7 +15,18 @@ pub fn get_categories(connection: &RecipeDatabase) -> Vec<Category> {
     categories
 }
 
-fn get_category(category_name: &str, connection: &RecipeDatabase) -> Option<Category> {
+pub fn get_category(category_id: i32, connection: &RecipeDatabase) -> Option<Category> {
+    let category = categories::table
+        .select(all_columns)
+        .filter(categories::id.eq(category_id))
+        .load::<Category>(&**connection)
+        .unwrap()
+        .first()?
+        .clone();
+    Some(category)
+}
+
+pub fn get_category_by_name(category_name: &str, connection: &RecipeDatabase) -> Option<Category> {
     let category = categories::table
         .select(all_columns)
         .filter(categories::name.eq(category_name))
@@ -27,11 +38,21 @@ fn get_category(category_name: &str, connection: &RecipeDatabase) -> Option<Cate
 }
 
 pub fn save_category(category: &NewCategory, connection: &RecipeDatabase) -> Result<usize, Error> {
-    if get_category(&category.name, connection).is_some() {
+    if get_category_by_name(&category.name, connection).is_some() {
         Err(Error::NotFound)
     } else {
         diesel::insert_into(categories::table)
             .values(category)
+            .execute(&**connection)
+    }
+}
+
+pub fn update_category(category: &Category, connection: &RecipeDatabase) -> Result<usize, Error> {
+    if get_category_by_name(&category.name, connection).is_some() {
+        Err(Error::NotFound)
+    } else {
+        diesel::update(categories::dsl::categories.find(category.id))
+            .set(categories::name.eq(&category.name))
             .execute(&**connection)
     }
 }

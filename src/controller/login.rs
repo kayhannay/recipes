@@ -46,7 +46,7 @@ pub fn login(
     login: Form<Login>,
 ) -> Result<Redirect, Flash<Redirect>> {
     let username = &login.username.clone();
-    let recipe_user = repository::user::get_user(username, &connection);
+    let recipe_user = repository::user::get_user_by_name(username, &connection);
     let error = Err(Flash::error(
         Redirect::to(uri!(login_page)),
         "Login failed!",
@@ -59,7 +59,7 @@ pub fn login(
     let cookie_user = recipe_user
         .map(|user| User {
             name: user.name.unwrap_or(user.username),
-            uid: user.uid,
+            uid: user.id,
         })
         .unwrap();
     if controller::common::create_hash(&login.password) == user.password {

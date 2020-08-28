@@ -22,8 +22,8 @@ table! {
 }
 
 table! {
-    user (uid) {
-        uid -> Integer,
+    user (id) {
+        id -> Integer,
         password -> Varchar,
         username -> Varchar,
         name -> Nullable<Varchar>,
@@ -32,4 +32,8 @@ table! {
     }
 }
 
-allow_tables_to_appear_in_same_query!(categories, recipes, user,);
+allow_tables_to_appear_in_same_query!(
+    categories,
+    recipes,
+    user,
+);

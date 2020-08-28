@@ -1,0 +1,46 @@
+{{#> layout/base title="Rezepte - Benutzer" }}
+
+    {{#*inline "head-block"}}
+    <style>
+        #user {
+            border: 3px solid #0000A0;
+            background-color: #DCDCFF;
+            padding: 1em;
+        }
+    </style>
+    {{/inline}}
+
+    {{#*inline "content-block"}}
+        {{> header }}
+
+        <h1>Rezepte: Benutzer bearbeiten</h1>
+
+        <div id="user">
+        {{#if common.message}}
+            <p>{{#if common.message_type}}{{common.message_type}}: {{/if}}{{ common.message }}</p>
+        {{/if}}
+
+        <form action="/update-user" method="post" accept-charset="utf-8">
+            <table>
+                <tr>
+                <tr>
+                    <td><label for="username">Benutzername</label></td>
+                    <td><input type="text" name="username" id="username" value="{{user.username}}" /></td>
+                </tr>
+                <tr>
+                    <td><label for="password">Passwort</label></td>
+                    <td><input type="password" name="password" id="password" value="" /></td>
+                </tr>
+                <tr>
+                    <td><label for="name">Name</label></td>
+                    <td><input type="text" name="name" id="name" value="{{user.name}}" /></td>
+                </tr>
+                    <td><input type="hidden" name="id" id="id" value="{{user.id}}" /></td>
+                </tr>
+            </table>
+            <p><input type="submit" value="Speichern"></p>
+        </form>
+        </div>
+    {{/inline}}
+
+{{/layout/base}}

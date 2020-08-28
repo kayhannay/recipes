@@ -1,0 +1,36 @@
+{{#> layout/base title="Rezepte - Kategorie" }}
+
+    {{#*inline "head-block"}}
+    <style>
+        #category {
+            border: 3px solid #0000A0;
+            background-color: #DCDCFF;
+            padding: 1em;
+        }
+    </style>
+    {{/inline}}
+
+    {{#*inline "content-block"}}
+        {{> header }}
+
+        <h1>Rezepte: Kategorie bearbeiten</h1>
+
+        <div id="category">
+        {{#if common.message}}
+            <p>{{#if common.message_type}}{{common.message_type}}: {{/if}}{{ common.message }}</p>
+        {{/if}}
+
+        <form action="/update-category" method="post" accept-charset="utf-8">
+            <table>
+                <tr>
+                    <td><label for="name">Name</label></td>
+                    <td><input type="text" name="name" id="name" value="{{category.name}}" /></td>
+                    <td><input type="hidden" name="id" id="id" value="{{category.id}}" /></td>
+                </tr>
+            </table>
+            <p><input type="submit" value="Speichern"></p>
+        </form>
+        </div>
+    {{/inline}}
+
+{{/layout/base}}

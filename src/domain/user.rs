@@ -5,9 +5,18 @@ use repository::schema::user;
 )]
 #[table_name = "user"]
 pub struct RecipeUser {
-    pub uid: i32,
+    pub id: i32,
     pub username: String,
     pub password: String,
+    pub name: Option<String>,
+}
+
+#[derive(Debug, AsChangeset, Identifiable)]
+#[table_name = "user"]
+pub struct UpdateRecipeUser {
+    pub id: i32,
+    pub username: Option<String>,
+    pub password: Option<String>,
     pub name: Option<String>,
 }
 
