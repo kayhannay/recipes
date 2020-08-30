@@ -50,7 +50,7 @@ fn create_test_recipe_by_category(
 }
 
 #[test]
-fn should_forward_to_recipelist_from_index() {
+^fn should_forward_to_recipe_list_from_index() {
     // Given
     let (client, _) = common::setup();
 
@@ -59,7 +59,7 @@ fn should_forward_to_recipelist_from_index() {
 
     // Then
     assert_eq!(response.status(), Status::SeeOther);
-    assert_eq!(response.headers().get_one("Location"), Some("/recipelist"));
+    assert_eq!(response.headers().get_one("Location"), Some("/recipe/list"));
 }
 
 #[test]
@@ -68,7 +68,7 @@ fn should_render_empty_recipe_list() {
     let (client, _database_connection) = common::setup();
 
     // When
-    let mut response = client.get("/recipelist").dispatch();
+    let mut response = client.get("/recipe/list").dispatch();
 
     // Then
     assert_eq!(response.status(), Status::Ok);
@@ -83,12 +83,12 @@ fn should_render_recipe_list() {
     // Given
     let (client, database_connection) = common::setup();
     let recipe = create_test_recipe(&database_connection);
-    recipes::repository::recipe::save_recipe(&recipe, &database_connection).ok();
+    recipes::repository::recipe::create_recipe(&recipe, &database_connection).ok();
     let recipes = recipes::repository::recipe::get_recipes(&database_connection);
     let recipe_id = recipes.get(0).unwrap().id;
 
     // When
-    let mut response = client.get("/recipelist").dispatch();
+    let mut response = client.get("/recipe/list").dispatch();
 
     // Then
     assert_eq!(response.status(), Status::Ok);
@@ -106,12 +106,12 @@ fn should_render_recipe_list_by_category() {
         create_test_recipe_by_category("Category1", "Recipe Category 1", &database_connection);
     let recipe_cat2 =
         create_test_recipe_by_category("Category2", "Recipe Category 2", &database_connection);
-    recipes::repository::recipe::save_recipe(&recipe_cat1, &database_connection).ok();
-    recipes::repository::recipe::save_recipe(&recipe_cat2, &database_connection).ok();
+    recipes::repository::recipe::create_recipe(&recipe_cat1, &database_connection).ok();
+    recipes::repository::recipe::create_recipe(&recipe_cat2, &database_connection).ok();
 
     // When
     let mut response = client
-        .get(format!("/recipelist/{}", recipe_cat2.category.unwrap()))
+        .get(format!("/recipe/list/{}", recipe_cat2.category.unwrap()))
         .dispatch();
 
     // Then
@@ -127,7 +127,7 @@ fn should_render_recipe() {
     // Given
     let (client, database_connection) = common::setup();
     let recipe = create_test_recipe(&database_connection);
-    recipes::repository::recipe::save_recipe(&recipe, &database_connection).ok();
+    recipes::repository::recipe::create_recipe(&recipe, &database_connection).ok();
     let recipes = recipes::repository::recipe::get_recipes(&database_connection);
     let recipe_id = recipes.get(0).unwrap().id;
 
@@ -160,7 +160,7 @@ fn should_redirect_anonymous() {
     let (client, _) = common::setup();
 
     // When
-    let response = client.get("/newrecipe").dispatch();
+    let response = client.get("/recipe/new").dispatch();
 
     // Then
     assert_eq!(response.status(), Status::SeeOther);
@@ -182,7 +182,7 @@ fn should_render_new_recipe_form() {
 
     // When
     let mut response = client
-        .get("/newrecipe")
+        .get("/recipe/new")
         .cookie(login_cookie.clone())
         .dispatch();
 
@@ -228,7 +228,7 @@ fn should_create_recipe() {
 
     // Then
     assert_eq!(response.status(), Status::SeeOther);
-    assert_eq!(response.headers().get_one("Location"), Some("/recipelist"));
+    assert_eq!(response.headers().get_one("Location"), Some("/recipe/list"));
     let recipes = recipes::repository::recipe::get_recipes(&database_connection);
     assert_eq!(recipes.len(), 1);
     println!("Recipes: {:?}", recipes);

@@ -51,7 +51,7 @@ pub fn get_recipe(id: i32, connection: &RecipeDatabase) -> Option<Recipe> {
     Some(recipe)
 }
 
-pub fn save_recipe(recipe: &NewRecipe, connection: &RecipeDatabase) -> QueryResult<usize> {
+pub fn create_recipe(recipe: &NewRecipe, connection: &RecipeDatabase) -> QueryResult<usize> {
     diesel::insert_into(recipes::table)
         .values(recipe)
         .execute(&**connection)

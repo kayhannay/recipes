@@ -17,7 +17,7 @@
 
         <div id="recipe-overview">
             Kategorie
-            <select id="categories" name="categories" onchange="javascript:location.href = '/recipelist/' + this.value;">
+            <select id="categories" name="categories" onchange="javascript:location.href = '/recipe/list/' + this.value;">
                 <option value="">Alle</option>
                 {{#each categories}}
                     <option value="{{this.id}}" {{selected this.id ../current_category}}>{{this.name}}</option>
