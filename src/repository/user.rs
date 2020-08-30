@@ -54,7 +54,7 @@ pub fn update_user(user: &UpdateRecipeUser, connection: &RecipeDatabase) -> Resu
         Err(Error::NotFound)
     } else {
         log::info!("Update ...");
-        let res= diesel::update(user).set(user).execute(&**connection);
+        let res = diesel::update(user).set(user).execute(&**connection);
         log::info!("Result: {:?}", res);
         res
     }

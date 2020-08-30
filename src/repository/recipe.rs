@@ -1,10 +1,10 @@
 use diesel::prelude::*;
+use diesel::result::Error;
 use domain::recipe::{NewRecipe, Recipe, RecipeName, UpdateRecipe};
 use repository;
 use repository::common::RecipeDatabase;
 use repository::schema::categories;
 use repository::schema::recipes;
-use diesel::result::Error;
 
 pub fn get_recipes(connection: &RecipeDatabase) -> Vec<RecipeName> {
     let mut recipe_list: Vec<RecipeName> = recipes::table
@@ -58,9 +58,7 @@ pub fn create_recipe(recipe: &NewRecipe, connection: &RecipeDatabase) -> QueryRe
 }
 
 pub fn update_recipe(recipe: &UpdateRecipe, connection: &RecipeDatabase) -> QueryResult<usize> {
-    diesel::update(recipe)
-        .set(recipe)
-        .execute(&**connection)
+    diesel::update(recipe).set(recipe).execute(&**connection)
 }
 
 pub fn delete_recipe(recipe_id: i32, connection: &RecipeDatabase) -> Result<usize, Error> {

@@ -50,7 +50,7 @@ fn create_test_recipe_by_category(
 }
 
 #[test]
-^fn should_forward_to_recipe_list_from_index() {
+fn should_forward_to_recipe_list_from_index() {
     // Given
     let (client, _) = common::setup();
 

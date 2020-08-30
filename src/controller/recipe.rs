@@ -1,13 +1,13 @@
 use bigdecimal::BigDecimal;
 use controller;
-use controller::common::{CommonContext, MessageType, User, create_common_context};
+use controller::common::{create_common_context, CommonContext, MessageType, User};
 use domain::category::Category;
-use domain::recipe::{RecipeName, UpdateRecipe};
 use domain::recipe::{NewRecipe, Recipe};
+use domain::recipe::{RecipeName, UpdateRecipe};
 use repository;
 use repository::common::RecipeDatabase;
 use rocket::http::Cookies;
-use rocket::request::{Form, FlashMessage};
+use rocket::request::{FlashMessage, Form};
 use rocket::response::{Flash, Redirect};
 use rocket_contrib::templates::Template;
 use std::str::FromStr;
@@ -126,7 +126,12 @@ pub fn recipe_new_form() -> Redirect {
 }
 
 #[get("/recipe/update/<id>")]
-pub fn recipe_update_form_user(id: i32, current_user: User, flash: Option<FlashMessage>, connection: RecipeDatabase) -> Template {
+pub fn recipe_update_form_user(
+    id: i32,
+    current_user: User,
+    flash: Option<FlashMessage>,
+    connection: RecipeDatabase,
+) -> Template {
     let categories = repository::category::get_categories(&connection);
     let recipe = repository::recipe::get_recipe(id, &connection);
     let context = UpdateRecipeModel {
@@ -148,7 +153,11 @@ pub struct UpdateRecipeForm {
 }
 
 #[post("/recipe/update", data = "<update_recipe>")]
-pub fn recipe_update_user(_user: User, update_recipe: Form<UpdateRecipeForm>, connection: RecipeDatabase) -> Result<Flash<Redirect>, Flash<Redirect>> {
+pub fn recipe_update_user(
+    _user: User,
+    update_recipe: Form<UpdateRecipeForm>,
+    connection: RecipeDatabase,
+) -> Result<Flash<Redirect>, Flash<Redirect>> {
     let update = update_recipe.0;
     log::info!("Recipe form: {:?}", update);
     let recipe = UpdateRecipe {
