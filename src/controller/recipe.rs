@@ -1,4 +1,4 @@
-use bigdecimal::BigDecimal;
+use bigdecimal::{BigDecimal, FromPrimitive};
 use controller;
 use controller::common::{create_common_context, CommonContext, MessageType, User};
 use domain::category::Category;
@@ -150,6 +150,7 @@ pub struct UpdateRecipeForm {
     preparation: String,
     category: Option<i32>,
     number_people: String,
+    owner: Option<i32>,
 }
 
 #[post("/recipe/update", data = "<update_recipe>")]
@@ -159,17 +160,21 @@ pub fn recipe_update_user(
     connection: RecipeDatabase,
 ) -> Result<Flash<Redirect>, Flash<Redirect>> {
     let update = update_recipe.0;
-    log::info!("Recipe form: {:?}", update);
     let recipe = UpdateRecipe {
         id: update.id,
         name: Some(update.name),
         ingredients: Some(update.ingredients),
         preparation: Some(update.preparation),
         category: update.category,
-        number_people: Some(BigDecimal::from_str(&update.number_people).unwrap()),
+        number_people: Some(
+            BigDecimal::from_str(update.number_people.as_str())
+                .ok()
+                .unwrap(),
+        ),
         experience: None,
+        created: None,
         rights: None,
-        owner: None,
+        owner: BigDecimal::from_i32(update.owner.unwrap()),
         time_need: None,
     };
     let result = repository::recipe::update_recipe(&recipe, &connection);

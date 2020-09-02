@@ -48,15 +48,10 @@ pub fn save_user(user: &NewRecipeUser, connection: &RecipeDatabase) -> Result<us
 
 pub fn update_user(user: &UpdateRecipeUser, connection: &RecipeDatabase) -> Result<usize, Error> {
     let existing_user = get_user_by_name(&user.username.clone().unwrap(), connection);
-    log::info!("Existing user: {:?}, update: {:?}", existing_user, user);
     if existing_user.is_some() && existing_user.unwrap().id != user.id {
-        log::info!("Error");
         Err(Error::NotFound)
     } else {
-        log::info!("Update ...");
-        let res = diesel::update(user).set(user).execute(&**connection);
-        log::info!("Result: {:?}", res);
-        res
+        diesel::update(user).set(user).execute(&**connection)
     }
 }
 

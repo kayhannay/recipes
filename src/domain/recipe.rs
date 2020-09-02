@@ -30,6 +30,7 @@ pub struct UpdateRecipe {
     pub category: Option<i32>,
     pub number_people: Option<BigDecimal>,
     pub experience: Option<String>,
+    pub created: Option<NaiveDateTime>,
     pub rights: Option<BigDecimal>,
     pub owner: Option<BigDecimal>,
     pub time_need: Option<String>,

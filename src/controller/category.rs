@@ -100,7 +100,6 @@ pub fn delete_category(
     connection: RecipeDatabase,
 ) -> Result<Flash<Redirect>, Flash<Redirect>> {
     let result = repository::category::delete_category(id, &connection);
-    log::info!("Delete result: {:?}", result);
     match result {
         Ok(1) => {
             log::info!("Deleted category {}", id);
