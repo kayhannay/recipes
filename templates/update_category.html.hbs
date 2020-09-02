@@ -1,13 +1,6 @@
 {{#> layout/base title="Rezepte - Kategorie" }}
 
     {{#*inline "head-block"}}
-    <style>
-        #category {
-            border: 3px solid #0000A0;
-            background-color: #DCDCFF;
-            padding: 1em;
-        }
-    </style>
     {{/inline}}
 
     {{#*inline "content-block"}}
@@ -15,7 +8,7 @@
 
         <h1>Rezepte: Kategorie bearbeiten</h1>
 
-        <div id="category">
+        <div class="content">
         {{#if common.message}}
             <p>{{#if common.message_type}}{{common.message_type}}: {{/if}}{{ common.message }}</p>
         {{/if}}

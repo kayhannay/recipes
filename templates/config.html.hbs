@@ -1,21 +1,13 @@
 {{#> layout/base title="Rezepte - Konfiguration" }}
 
     {{#*inline "head-block"}}
-        <style>
-            .configuration {
-                border: 3px solid #0000A0;
-                background-color: #DCDCFF;
-                padding: 1em;
-                margin-bottom: 1em;
-            }
-        </style>
     {{/inline}}
 
     {{#*inline "content-block"}}
         {{> header }}
         <h1>Rezepte: Konfiguration</h1>
 
-        <div class="configuration">
+        <div class="content">
             <h2>Benutzer</h2>
             <table>
                 <tr>
@@ -49,7 +41,8 @@
                 <p><input type="submit" value="Erstellen"></p>
             </form>
         </div>
-        <div class="configuration">
+
+        <div class="content">
             <h2>Kategorien</h2>
             <table>
                 <tr>

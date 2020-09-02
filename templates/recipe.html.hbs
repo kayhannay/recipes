@@ -1,19 +1,12 @@
 {{#> layout/base title="Rezepte - Details" }}
 
     {{#*inline "head-block"}}
-        <style>
-            #recipe-details {
-                border: 3px solid #0000A0;
-                background-color: #DCDCFF;
-                padding: 1em;
-            }
-        </style>
     {{/inline}}
 
     {{#*inline "content-block"}}
         {{> header }}
         <h1>Rezept</h1>
-        <div id="recipe-details">
+        <div class="content">
             <p id="recipe-catrgory"><b>Kategorie:</b> {{recipe.category}}</p>
             <h2 id="recipe-name">{{recipe.name}}</h2>
             <b>Zutaten</b><br/>
@@ -24,7 +17,7 @@
             <p id="recipe-created"><b>vom:</b> {{recipe.created}}</p>
         </div>
         {{#if common.current_user}}
-            <a href="/recipe/update/{{recipe.id}}">Bearbeiten</a>
+            <a href="/recipe/update/{{recipe.id}}">Bearbeiten</a> |
             <a href="#" onclick="if (confirm('Rezept wirklich löschen?')) { window.location='/recipe/delete/{{recipe.id}}';}">Löschen</a>
         {{/if}}
     {{/inline}}
