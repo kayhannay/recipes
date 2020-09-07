@@ -170,14 +170,7 @@ fn should_redirect_anonymous() {
 fn should_render_new_recipe_form() {
     // Given
     let (client, database_connection) = common::setup();
-    let password = "geheim";
-    let user = recipes::domain::user::NewRecipeUser {
-        username: "testuser".to_string(),
-        password: recipes::controller::common::create_hash(password),
-        name: None,
-    };
-    recipes::repository::user::save_user(&user, &database_connection).ok();
-    let login_cookie = common::login(&client, &user.username, password).expect("logged in");
+    let (_user, login_cookie) = common::create_login_user(&client, &database_connection);
 
     // When
     let mut response = client
@@ -197,14 +190,7 @@ fn should_render_new_recipe_form() {
 fn should_create_recipe() {
     // Given
     let (client, database_connection) = common::setup();
-    let password = "geheim";
-    let user = recipes::domain::user::NewRecipeUser {
-        username: "testuser".to_string(),
-        password: recipes::controller::common::create_hash(password),
-        name: None,
-    };
-    recipes::repository::user::save_user(&user, &database_connection).ok();
-    let login_cookie = common::login(&client, &user.username, password).expect("logged in");
+    let (user, login_cookie) = common::create_login_user(&client, &database_connection);
     let db_user =
         recipes::repository::user::get_user_by_name(&user.username, &database_connection).unwrap();
     let test_recipe = create_test_recipe(&database_connection);
@@ -242,17 +228,112 @@ fn should_create_recipe() {
 }
 
 #[test]
+fn should_delete_recipe() {
+    // Given
+    let (client, database_connection) = common::setup();
+    let (_user, login_cookie) = common::create_login_user(&client, &database_connection);
+    let test_recipe = create_test_recipe(&database_connection);
+    recipes::repository::recipe::create_recipe(&test_recipe, &database_connection).ok();
+    let db_recipes = recipes::repository::recipe::get_recipes(&database_connection);
+    let db_recipe_id = db_recipes.get(0).unwrap().id;
+
+    // When
+    let response = client
+        .get(format!("/recipe/delete/{}", db_recipe_id))
+        .cookie(login_cookie.clone())
+        .dispatch();
+
+    // Then
+    assert_eq!(response.status(), Status::SeeOther);
+    assert_eq!(response.headers().get_one("Location"), Some("/recipe/list"));
+    let flash_cookie = common::get_cookie(&response, "_flash");
+    assert_eq!(flash_cookie.unwrap().value(), "7:successRecipe deleted");
+    let recipes = recipes::repository::recipe::get_recipes(&database_connection);
+    assert_eq!(recipes.len(), 0);
+}
+
+#[test]
+fn should_not_delete_recipe() {
+    // Given
+    let (client, database_connection) = common::setup();
+    let (_user, login_cookie) = common::create_login_user(&client, &database_connection);
+
+    // When
+    let response = client
+        .get("/recipe/delete/123")
+        .cookie(login_cookie.clone())
+        .dispatch();
+
+    // Then
+    assert_eq!(response.status(), Status::SeeOther);
+    assert_eq!(response.headers().get_one("Location"), Some("/recipe/123"));
+    let flash_cookie = common::get_cookie(&response, "_flash");
+    assert_eq!(
+        flash_cookie.unwrap().value(),
+        "5:errorCould not delete recipe!"
+    );
+    let recipes = recipes::repository::recipe::get_recipes(&database_connection);
+    assert_eq!(recipes.len(), 0);
+}
+
+#[test]
+fn should_redirect_anonymous_delete() {
+    // Given
+    let (client, _) = common::setup();
+
+    // When
+    let response = client.get("/recipe/delete/123").dispatch();
+
+    // Then
+    assert_eq!(response.status(), Status::SeeOther);
+    assert_eq!(response.headers().get_one("Location"), Some("/login"));
+}
+
+#[test]
+fn should_render_update_recipe_form() {
+    // Given
+    let (client, database_connection) = common::setup();
+    let (_user, login_cookie) = common::create_login_user(&client, &database_connection);
+    let test_recipe = create_test_recipe(&database_connection);
+    recipes::repository::recipe::create_recipe(&test_recipe, &database_connection).ok();
+    let db_recipes = recipes::repository::recipe::get_recipes(&database_connection);
+    let db_recipe_id = db_recipes.get(0).unwrap().id;
+
+    // When
+    let mut response = client
+        .get(format!("/recipe/update/{}", db_recipe_id))
+        .cookie(login_cookie.clone())
+        .dispatch();
+
+    // Then
+    assert_eq!(response.status(), Status::Ok);
+    let body = response.body_string().unwrap();
+    assert!(body.contains("<title>Rezepte - Bearbeiten</title>"));
+    assert!(body.contains(&format!("value=\"{}\"", test_recipe.name)));
+    assert!(body.contains(&format!("{}</textarea>", test_recipe.preparation)));
+    assert!(body.contains(&format!("{}</textarea>", test_recipe.ingredients)));
+    assert!(body.contains(&format!("value=\"{}\"", test_recipe.number_people.unwrap())));
+    assert!(body.contains(&format!("value=\"{}\"", db_recipe_id)));
+}
+
+#[test]
+fn should_redirect_anonymous_update() {
+    // Given
+    let (client, _) = common::setup();
+
+    // When
+    let response = client.get("/recipe/update/123").dispatch();
+
+    // Then
+    assert_eq!(response.status(), Status::SeeOther);
+    assert_eq!(response.headers().get_one("Location"), Some("/login"));
+}
+
+#[test]
 fn should_update_recipe() {
     // Given
     let (client, database_connection) = common::setup();
-    let password = "geheim";
-    let user = recipes::domain::user::NewRecipeUser {
-        username: "testuser".to_string(),
-        password: recipes::controller::common::create_hash(password),
-        name: None,
-    };
-    recipes::repository::user::save_user(&user, &database_connection).ok();
-    let login_cookie = common::login(&client, &user.username, password).expect("logged in");
+    let (user, login_cookie) = common::create_login_user(&client, &database_connection);
     let db_user =
         recipes::repository::user::get_user_by_name(&user.username, &database_connection).unwrap();
     let test_recipe = create_test_recipe(&database_connection);

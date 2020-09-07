@@ -142,6 +142,11 @@ pub fn recipe_update_form_user(
     Template::render("update_recipe", &context)
 }
 
+#[get("/recipe/update/<_id>", rank = 2)]
+pub fn recipe_update_form(_id: i32) -> Redirect {
+    Redirect::to(uri!(controller::login::login_page))
+}
+
 #[derive(Debug, FromForm)]
 pub struct UpdateRecipeForm {
     id: i32,
@@ -213,6 +218,11 @@ pub fn recipe_delete_user(
             "Could not delete recipe!",
         )),
     }
+}
+
+#[get("/recipe/delete/<_id>", rank = 2)]
+pub fn recipe_delete(_id: i32) -> Redirect {
+    Redirect::to(uri!(controller::login::login_page))
 }
 
 #[derive(Serialize)]

@@ -19,7 +19,8 @@ pub struct UpdateCategory {
 }
 
 #[post("/category", data = "<new_category>")]
-pub fn create_category(
+pub fn category_create_user(
+    _user: User,
     connection: RecipeDatabase,
     new_category: Form<CreateCategory>,
 ) -> Result<Flash<Redirect>, Flash<Redirect>> {
@@ -51,8 +52,8 @@ struct CategoryModel {
     common: CommonContext,
 }
 
-#[get("/update-category/<id>")]
-pub fn update_category_form(
+#[get("/category/update/<id>")]
+pub fn category_update_form_user(
     id: i32,
     user: User,
     flash: Option<FlashMessage>,
@@ -66,8 +67,14 @@ pub fn update_category_form(
     Some(Template::render("update_category", &context))
 }
 
-#[post("/update-category", data = "<update_category>")]
-pub fn update_category(
+#[get("/category/update/<_id>", rank = 2)]
+pub fn category_update_form(_id: i32) -> Redirect {
+    Redirect::to(uri!(controller::login::login_page))
+}
+
+#[post("/category/update", data = "<update_category>")]
+pub fn category_update_user(
+    _user: User,
     connection: RecipeDatabase,
     update_category: Form<UpdateCategory>,
 ) -> Result<Flash<Redirect>, Flash<Redirect>> {
@@ -94,9 +101,10 @@ pub fn update_category(
     }
 }
 
-#[get("/deletecategory/<id>")]
-pub fn delete_category(
+#[get("/category/delete/<id>")]
+pub fn category_delete_user(
     id: i32,
+    _user: User,
     connection: RecipeDatabase,
 ) -> Result<Flash<Redirect>, Flash<Redirect>> {
     let result = repository::category::delete_category(id, &connection);
@@ -113,4 +121,9 @@ pub fn delete_category(
             "Could not delete category!",
         )),
     }
+}
+
+#[get("/category/delete/<_id>", rank = 2)]
+pub fn category_delete(_id: i32) -> Redirect {
+    Redirect::to(uri!(controller::login::login_page))
 }

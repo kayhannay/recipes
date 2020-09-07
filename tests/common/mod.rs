@@ -84,6 +84,21 @@ pub fn get_cookie(response: &LocalResponse<'_>, name: &str) -> Option<Cookie<'st
     cookie.map(|c| c.into_owned())
 }
 
+pub fn create_login_user(
+    client: &Client,
+    database_connection: &recipes::repository::common::RecipeDatabase,
+) -> (recipes::domain::user::NewRecipeUser, Cookie<'static>) {
+    let password = "geheim";
+    let user = recipes::domain::user::NewRecipeUser {
+        username: "loginuser".to_string(),
+        password: recipes::controller::common::create_hash(password),
+        name: None,
+    };
+    recipes::repository::user::save_user(&user, &database_connection).ok();
+    let login_cookie = login(&client, &user.username, password).expect("logged in");
+    (user, login_cookie)
+}
+
 pub fn login(client: &Client, user: &str, pass: &str) -> Option<Cookie<'static>> {
     let response = client
         .post("/login")

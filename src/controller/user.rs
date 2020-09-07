@@ -16,16 +16,9 @@ pub struct CreateUser {
     name: String,
 }
 
-#[derive(FromForm)]
-pub struct UpdateUser {
-    id: i32,
-    username: String,
-    password: String,
-    name: String,
-}
-
 #[post("/user", data = "<new_user>")]
-pub fn create_user(
+pub fn user_create_user(
+    _user: User,
     connection: RecipeDatabase,
     new_user: Form<CreateUser>,
 ) -> Result<Flash<Redirect>, Flash<Redirect>> {
@@ -66,8 +59,8 @@ struct UserModel {
     common: CommonContext,
 }
 
-#[get("/update-user/<id>")]
-pub fn update_user_form(
+#[get("/user/update/<id>")]
+pub fn user_update_form_user(
     id: i32,
     user: User,
     flash: Option<FlashMessage>,
@@ -82,8 +75,21 @@ pub fn update_user_form(
     Some(Template::render("update_user", &context))
 }
 
-#[post("/update-user", data = "<update_user>")]
-pub fn update_user(
+#[get("/user/update/<_id>", rank = 2)]
+pub fn user_update_form(_id: i32) -> Redirect {
+    Redirect::to(uri!(controller::login::login_page))
+}
+
+#[derive(FromForm)]
+pub struct UpdateUser {
+    id: i32,
+    username: String,
+    password: String,
+    name: String,
+}
+
+#[post("/user/update", data = "<update_user>")]
+pub fn user_update(
     _user: User,
     connection: RecipeDatabase,
     update_user: Form<UpdateUser>,
@@ -93,7 +99,8 @@ pub fn update_user(
         &UpdateRecipeUser {
             id: user.id,
             username: Some(user.username).filter(|x| !x.is_empty()),
-            password: Some(user.password).filter(|x| !x.is_empty()),
+            password: Some(controller::common::create_hash(&user.password))
+                .filter(|x| !x.is_empty()),
             name: Some(user.name.clone()).filter(|x| !x.is_empty()),
         },
         &connection,
@@ -113,9 +120,10 @@ pub fn update_user(
     }
 }
 
-#[get("/deleteuser/<id>")]
-pub fn delete_user(
+#[get("/user/delete/<id>")]
+pub fn user_delete_user(
     id: i32,
+    _user: User,
     connection: RecipeDatabase,
 ) -> Result<Flash<Redirect>, Flash<Redirect>> {
     let result = repository::user::delete_user(id, &connection);
@@ -132,4 +140,9 @@ pub fn delete_user(
             "Could not delete user!",
         )),
     }
+}
+
+#[get("/user/delete/<_id>", rank = 2)]
+pub fn user_delete(_id: i32) -> Redirect {
+    Redirect::to(uri!(controller::login::login_page))
 }
