@@ -43,4 +43,5 @@ release:
 deploy:
   stage: deploy
   script:
+    - mkdir -p ~/.ssh && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
     - scp -i $SSH_KEY -r target/release/recipes templates recipes.service gitlab-ci@hh-nas.hannay.de:/opt/recipes/
