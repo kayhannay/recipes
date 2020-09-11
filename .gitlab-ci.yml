@@ -38,3 +38,8 @@ release:
       - recipes
       - templates
       - recipes.service
+
+deploy:
+  stage: deploy
+  script:
+    - scp -i $SSH_KEY -r target/release/recipes templates recipes.service /opt/recipes/
