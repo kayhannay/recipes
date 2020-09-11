@@ -6,6 +6,7 @@ stages:
   - build
   - test
   - release
+  - deploy
 
 init:
   stage: init
