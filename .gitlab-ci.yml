@@ -37,12 +37,12 @@ release:
   artifacts:
     paths:
       - recipes
-      - templates
-      - recipes.service
 
 deploy:
   stage: deploy
+  dependencies:
+    - release
   script:
     - mkdir -p ~/.ssh && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
     - chmod 600 $SSH_KEY
-    - scp -i $SSH_KEY -P2022 -r target/release/recipes templates recipes.service gitlab-ci@hh-nas.hannay.de:/opt/recipes/
+    - scp -i $SSH_KEY -P2022 -r recipes templates recipes.service gitlab-ci@hh-nas.hannay.de:/opt/recipes/
