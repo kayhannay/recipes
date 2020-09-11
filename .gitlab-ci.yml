@@ -43,4 +43,4 @@ release:
 deploy:
   stage: deploy
   script:
-    - scp -i $SSH_KEY -r target/release/recipes templates recipes.service /opt/recipes/
+    - scp -i $SSH_KEY -r target/release/recipes templates recipes.service gitlab-ci@hh-nas.hannay.de:/opt/recipes/
