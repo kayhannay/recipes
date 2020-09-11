@@ -45,4 +45,6 @@ deploy:
   script:
     - mkdir -p ~/.ssh && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
     - chmod 600 $SSH_KEY
+    - ls -l $SSH_KEY
+    - cat $SSH_KEY
     - scp -i $SSH_KEY -r target/release/recipes templates recipes.service gitlab-ci@hh-nas.hannay.de:/opt/recipes/
