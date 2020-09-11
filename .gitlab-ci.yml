@@ -45,5 +45,6 @@ deploy:
   script:
     - mkdir -p ~/.ssh && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
     - chmod 600 $SSH_KEY
-    - ls -l
+    - ssh -i $SSH_KEY -p2022 "sudo systemctl stop recipes.service"
     - scp -i $SSH_KEY -P2022 -r recipes templates recipes.service gitlab-ci@hh-nas.hannay.de:/opt/recipes/
+    - ssh -i $SSH_KEY -p2022 "sudo systemctl start recipes.service"
